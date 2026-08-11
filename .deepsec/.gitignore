@@ -1,0 +1,10 @@
+node_modules/
+.env*.local
+data/*/files/
+data/*/runs/
+data/*/reports/
+data/*/revalidation/
+data/*/project.json
+data/*/tech.json
+findings/
+comment.md

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd">
+    <suppress until="2027-08-11Z">
+        <notes><![CDATA[
+        AndroidX SQLite 2.6.2 is a Java/Kotlin API wrapper. Its AARs contain no
+        SQLite native library; Dependency-Check confuses the AndroidX library
+        version with the unrelated SQLite engine version 2.6.2.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/androidx\.sqlite/sqlite(?:-framework)?-android@2\.6\.2$</packageUrl>
+        <cpe>cpe:/a:sqlite:sqlite</cpe>
+    </suppress>
+    <suppress until="2026-10-01Z">
+        <notes><![CDATA[
+        CVE-2026-53914 affects Kotlin build-cache metadata, not kotlin-stdlib at
+        application runtime. Kotlin task caching is disabled in gradle.properties
+        until the fixed Kotlin 2.4.20 has a stable release.
+        ]]></notes>
+        <packageUrl>pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.4.10</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+</suppressions>

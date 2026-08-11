@@ -1,0 +1,10 @@
+root = true
+
+[*.{kt,kts}]
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
+[**/AppRoute.kt]
+ktlint_property_naming_constant_naming = pascal_case
+
+[**/Tokens.kt]
+ktlint_property_naming_constant_naming = pascal_case

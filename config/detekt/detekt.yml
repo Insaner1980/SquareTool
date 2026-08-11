@@ -1,0 +1,33 @@
+config:
+  validation: true
+  warningsAsErrors: false
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated:
+      - Composable
+
+complexity:
+  ComplexCondition:
+    allowedConditions: 5
+  CyclomaticComplexMethod:
+    allowedComplexity: 23
+    ignoreAnnotated:
+      - Composable
+  LongMethod:
+    allowedLines: 132
+    ignoreAnnotated:
+      - Composable
+  TooManyFunctions:
+    allowedFunctionsPerFile: 20
+    allowedFunctionsPerClass: 63
+    allowedFunctionsPerInterface: 24
+    allowedFunctionsPerObject: 21
+
+style:
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    maxLineLength: 140
+  ReturnCount:
+    max: 7

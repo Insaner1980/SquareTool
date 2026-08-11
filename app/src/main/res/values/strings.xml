@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SquareTool</string>
+    <string name="app_description">Plan granny square blankets visually, privately, and offline.</string>
+    <string name="visual_planning_disclaimer">Square previews are visual planning motifs. SquareTool does not generate crochet instructions.</string>
+    <string name="home">Home</string>
+    <string name="planner">Planner</string>
+    <string name="squares">Squares</string>
+    <string name="library">Library</string>
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="design_your_squares">Design your squares</string>
+    <string name="design_your_squares_body">Choose a visual motif and give each round colors from your own library.</string>
+    <string name="build_your_blanket">Build your blanket</string>
+    <string name="build_your_blanket_body">Paint your grid, generate useful arrangements, and lock the cells you want to keep.</string>
+    <string name="keep_a_clear_project_plan">Keep a clear project plan</string>
+    <string name="keep_a_clear_project_plan_body">Track completed squares, review visual estimates, and export a plan you can use offline.</string>
+    <string name="ready_to_begin">Ready to begin?</string>
+    <string name="ready_to_begin_body">Start with an empty project or explore the editable Autumn Garden Blanket sample.</string>
+    <string name="create_new_project">Create a new project</string>
+    <string name="explore_sample_project">Explore a sample project</string>
+    <string name="page_of_pages">Page %1$d of %2$d</string>
+    <string name="no_projects_yet">No projects yet</string>
+    <string name="create_project_to_open_planner">Create a project to start planning your blanket.</string>
+    <string name="create_project">Create project</string>
+    <string name="onboarding_action_failed">That could not be completed. Please try again.</string>
+</resources>

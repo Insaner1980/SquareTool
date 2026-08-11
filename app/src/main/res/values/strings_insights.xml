@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="insights_title">Project Insights</string>
+    <string name="insights_back">Back</string>
+    <string name="insights_project_missing">This project is no longer available.</string>
+    <string name="insights_total_squares">Total squares</string>
+    <string name="insights_designs">Square designs</string>
+    <string name="insights_colors">Colors</string>
+    <string name="insights_completion">Completion</string>
+    <string name="insights_estimated_skeins">Estimated skeins</string>
+    <string name="insights_distribution">Square Type Distribution</string>
+    <plurals name="insights_assigned_total">
+        <item quantity="one">%1$d square assigned</item>
+        <item quantity="other">%1$d squares assigned</item>
+    </plurals>
+    <string name="insights_distribution_row">%1$d · %2$d%%</string>
+    <string name="insights_chart_description">Square distribution. %1$s</string>
+    <plurals name="insights_chart_item_description">
+        <item quantity="one">%1$s: %2$s, %3$d percent.</item>
+        <item quantity="other">%1$s: %2$s, %3$d percent.</item>
+    </plurals>
+    <string name="insights_no_distribution">Assign square designs in Planner to see a distribution.</string>
+    <string name="insights_color_usage">Color Usage</string>
+    <string name="insights_other">Other</string>
+    <string name="insights_color_percentage">%1$.1f%%</string>
+    <string name="insights_color_grams">%1$.1f g</string>
+    <string name="insights_color_skeins">%1$.2f skeins</string>
+    <string name="insights_no_color_usage">Assign saved square designs to calculate color usage.</string>
+    <string name="insights_dimensions">Blanket Dimensions</string>
+    <string name="insights_grid_size">Grid: %1$d × %2$d</string>
+    <string name="insights_finished_size">%1$s × %2$s %3$s</string>
+    <string name="insights_unit_cm">cm</string>
+    <string name="insights_unit_in">in</string>
+    <string name="insights_joining_gap">Joining gap: %1$s %2$s</string>
+    <string name="insights_dimensions_missing">Add square measurements to calculate finished size.</string>
+    <string name="insights_yarn_estimate">Yarn Estimate</string>
+    <string name="insights_equivalent_skeins">%1$s equivalent skeins</string>
+    <plurals name="insights_recommended_skeins">
+        <item quantity="one">%1$d whole skein recommended</item>
+        <item quantity="other">%1$d whole skeins recommended</item>
+    </plurals>
+    <string name="insights_buffer">Includes a %1$s%% joining and edging buffer.</string>
+    <string name="insights_skein_weight">Skein weight: %1$s g</string>
+    <string name="insights_yarn_disclaimer">This is a planning estimate based on your saved grams-per-square values.</string>
+    <string name="insights_yarn_missing">Add grams per square and skein weight in Edit Project to calculate yarn.</string>
+    <string name="insights_progress">Progress</string>
+    <string name="insights_completed_count">Completed: %1$d</string>
+    <string name="insights_remaining_count">Remaining: %1$d</string>
+    <string name="insights_percent_complete">%1$d%% complete</string>
+    <string name="insights_export_share">Export &amp; Share</string>
+    <string name="insights_export_description">Create a local plan, image, share file, or project backup.</string>
+    <string name="insights_export_pdf">Export PDF Plan</string>
+    <string name="insights_save_image">Save High-Resolution Image</string>
+    <string name="insights_share_pdf">Share PDF</string>
+    <string name="insights_share_image">Share Image</string>
+    <string name="insights_export_backup">Export Project Backup</string>
+    <plurals name="insights_square_count">
+        <item quantity="one">%d square</item>
+        <item quantity="other">%d squares</item>
+    </plurals>
+</resources>

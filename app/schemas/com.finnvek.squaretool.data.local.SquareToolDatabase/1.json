@@ -1,0 +1,733 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "9479d481e95c30da59256395ba5745e6",
+    "entities": [
+      {
+        "tableName": "projects",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `rowCount` INTEGER NOT NULL, `columnCount` INTEGER NOT NULL, `squareWidthValue` REAL, `squareHeightValue` REAL, `measurementUnit` TEXT NOT NULL, `joiningGapValue` REAL, `trackingEnabled` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, `notes` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `lastOpenedAt` INTEGER NOT NULL, `generationSeed` INTEGER NOT NULL, `defaultSquareDesignId` TEXT, `globalGramsPerSquare` REAL, `skeinWeightGrams` REAL, `joiningAndEdgingBufferPercent` REAL NOT NULL, `demoProject` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`defaultSquareDesignId`) REFERENCES `square_designs`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowCount",
+            "columnName": "rowCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "columnCount",
+            "columnName": "columnCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "squareWidthValue",
+            "columnName": "squareWidthValue",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "squareHeightValue",
+            "columnName": "squareHeightValue",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "measurementUnit",
+            "columnName": "measurementUnit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "joiningGapValue",
+            "columnName": "joiningGapValue",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "trackingEnabled",
+            "columnName": "trackingEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastOpenedAt",
+            "columnName": "lastOpenedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generationSeed",
+            "columnName": "generationSeed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultSquareDesignId",
+            "columnName": "defaultSquareDesignId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "globalGramsPerSquare",
+            "columnName": "globalGramsPerSquare",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "skeinWeightGrams",
+            "columnName": "skeinWeightGrams",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "joiningAndEdgingBufferPercent",
+            "columnName": "joiningAndEdgingBufferPercent",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "demoProject",
+            "columnName": "demoProject",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_projects_defaultSquareDesignId",
+            "unique": false,
+            "columnNames": [
+              "defaultSquareDesignId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projects_defaultSquareDesignId` ON `${TABLE_NAME}` (`defaultSquareDesignId`)"
+          },
+          {
+            "name": "index_projects_favorite_lastOpenedAt",
+            "unique": false,
+            "columnNames": [
+              "favorite",
+              "lastOpenedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projects_favorite_lastOpenedAt` ON `${TABLE_NAME}` (`favorite`, `lastOpenedAt`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "square_designs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "defaultSquareDesignId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "square_designs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `motifTemplateId` TEXT NOT NULL, `note` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `builtIn` INTEGER NOT NULL, `category` TEXT NOT NULL, `gramsPerSquareOverride` REAL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "motifTemplateId",
+            "columnName": "motifTemplateId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "builtIn",
+            "columnName": "builtIn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gramsPerSquareOverride",
+            "columnName": "gramsPerSquareOverride",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_square_designs_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_square_designs_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_square_designs_category",
+            "unique": false,
+            "columnNames": [
+              "category"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_square_designs_category` ON `${TABLE_NAME}` (`category`)"
+          }
+        ]
+      },
+      {
+        "tableName": "square_rounds",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`squareDesignId` TEXT NOT NULL, `roundIndex` INTEGER NOT NULL, `colorId` TEXT NOT NULL, PRIMARY KEY(`squareDesignId`, `roundIndex`), FOREIGN KEY(`squareDesignId`) REFERENCES `square_designs`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`colorId`) REFERENCES `colors`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "squareDesignId",
+            "columnName": "squareDesignId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roundIndex",
+            "columnName": "roundIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colorId",
+            "columnName": "colorId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "squareDesignId",
+            "roundIndex"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_square_rounds_colorId",
+            "unique": false,
+            "columnNames": [
+              "colorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_square_rounds_colorId` ON `${TABLE_NAME}` (`colorId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "square_designs",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "squareDesignId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "colors",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "colorId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "colors",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `argb` INTEGER NOT NULL, `yarnBrand` TEXT, `yarnLine` TEXT, `shadeName` TEXT, `shadeCode` TEXT, `skeinWeightGrams` REAL, `yarnLength` REAL, `yarnLengthUnit` TEXT, `notes` TEXT NOT NULL, `builtIn` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "argb",
+            "columnName": "argb",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yarnBrand",
+            "columnName": "yarnBrand",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "yarnLine",
+            "columnName": "yarnLine",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "shadeName",
+            "columnName": "shadeName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "shadeCode",
+            "columnName": "shadeCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "skeinWeightGrams",
+            "columnName": "skeinWeightGrams",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "yarnLength",
+            "columnName": "yarnLength",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "yarnLengthUnit",
+            "columnName": "yarnLengthUnit",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "builtIn",
+            "columnName": "builtIn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_colors_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_colors_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "palettes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `builtIn` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "builtIn",
+            "columnName": "builtIn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_palettes_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_palettes_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "palette_color_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`paletteId` TEXT NOT NULL, `colorId` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, PRIMARY KEY(`paletteId`, `colorId`), FOREIGN KEY(`paletteId`) REFERENCES `palettes`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`colorId`) REFERENCES `colors`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "paletteId",
+            "columnName": "paletteId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colorId",
+            "columnName": "colorId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "paletteId",
+            "colorId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_palette_color_cross_ref_colorId",
+            "unique": false,
+            "columnNames": [
+              "colorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_palette_color_cross_ref_colorId` ON `${TABLE_NAME}` (`colorId`)"
+          },
+          {
+            "name": "index_palette_color_cross_ref_paletteId_displayOrder",
+            "unique": true,
+            "columnNames": [
+              "paletteId",
+              "displayOrder"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_palette_color_cross_ref_paletteId_displayOrder` ON `${TABLE_NAME}` (`paletteId`, `displayOrder`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "palettes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "paletteId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "colors",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "colorId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "project_palette_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` TEXT NOT NULL, `colorId` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, PRIMARY KEY(`projectId`, `colorId`), FOREIGN KEY(`projectId`) REFERENCES `projects`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`colorId`) REFERENCES `colors`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "projectId",
+            "columnName": "projectId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colorId",
+            "columnName": "colorId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "projectId",
+            "colorId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_project_palette_cross_ref_colorId",
+            "unique": false,
+            "columnNames": [
+              "colorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_project_palette_cross_ref_colorId` ON `${TABLE_NAME}` (`colorId`)"
+          },
+          {
+            "name": "index_project_palette_cross_ref_projectId_displayOrder",
+            "unique": true,
+            "columnNames": [
+              "projectId",
+              "displayOrder"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_project_palette_cross_ref_projectId_displayOrder` ON `${TABLE_NAME}` (`projectId`, `displayOrder`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "projects",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "projectId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "colors",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "colorId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "project_cells",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` TEXT NOT NULL, `rowIndex` INTEGER NOT NULL, `columnIndex` INTEGER NOT NULL, `squareDesignId` TEXT, `locked` INTEGER NOT NULL, `completed` INTEGER NOT NULL, `gramsPerSquareOverride` REAL, PRIMARY KEY(`projectId`, `rowIndex`, `columnIndex`), FOREIGN KEY(`projectId`) REFERENCES `projects`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`squareDesignId`) REFERENCES `square_designs`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "projectId",
+            "columnName": "projectId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowIndex",
+            "columnName": "rowIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "columnIndex",
+            "columnName": "columnIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "squareDesignId",
+            "columnName": "squareDesignId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "locked",
+            "columnName": "locked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completed",
+            "columnName": "completed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gramsPerSquareOverride",
+            "columnName": "gramsPerSquareOverride",
+            "affinity": "REAL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "projectId",
+            "rowIndex",
+            "columnIndex"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_project_cells_projectId",
+            "unique": false,
+            "columnNames": [
+              "projectId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_project_cells_projectId` ON `${TABLE_NAME}` (`projectId`)"
+          },
+          {
+            "name": "index_project_cells_squareDesignId",
+            "unique": false,
+            "columnNames": [
+              "squareDesignId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_project_cells_squareDesignId` ON `${TABLE_NAME}` (`squareDesignId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "projects",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "projectId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "square_designs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "squareDesignId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9479d481e95c30da59256395ba5745e6')"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="export_squaretool_title">SquareTool visual project plan</string>
+    <string name="export_date">Exported %1$s</string>
+    <string name="export_grid_summary">Grid: %1$d × %2$d · Total squares: %3$d</string>
+    <string name="export_dimensions">Finished size (estimated): %1$s × %2$s %3$s</string>
+    <string name="export_unit_centimeters">cm</string>
+    <string name="export_unit_inches">in</string>
+    <string name="export_design_legend">Square design legend</string>
+    <string name="export_color_palette">Color palette and visual usage</string>
+    <string name="export_materials_summary">Materials summary</string>
+    <plurals name="export_design_line">
+        <item quantity="one">%1$s · %2$s · %3$d square</item>
+        <item quantity="other">%1$s · %2$s · %3$d squares</item>
+    </plurals>
+    <string name="export_color_usage_line">%1$s · %2$s · %3$s%% estimated visual usage</string>
+    <string name="export_color_yarn_grams">%1$s g estimated</string>
+    <string name="export_progress">Progress: %1$d/%2$d (%3$d%%)</string>
+    <string name="export_yarn_equivalent">Estimated yarn — equivalent skeins: %1$s · recommended whole skeins: %2$d</string>
+    <string name="export_buffer">Includes a %1$s%% joining and edging buffer.</string>
+    <string name="export_missing_measurements">Finished dimensions are not configured.</string>
+    <string name="export_disclaimer">This document is a visual layout plan. SquareTool does not generate crochet instructions.</string>
+    <string name="export_section_title">Grid section: rows %1$d–%2$d, columns %3$d–%4$d</string>
+    <string name="export_pdf_plan">Export PDF Plan</string>
+    <string name="export_png_plan">Save High-Resolution Image</string>
+    <string name="share_pdf">Share PDF</string>
+    <string name="share_image">Share Image</string>
+    <string name="export_backup">Export Project Backup</string>
+    <string name="export_project_title">Export project</string>
+    <string name="export_project_description">Create a local visual plan, high-resolution image, or backup. No file is uploaded.</string>
+    <string name="export_options">Export options</string>
+    <string name="paper_size">PDF paper size</string>
+    <string name="paper_auto">Automatic</string>
+    <string name="paper_a4">A4</string>
+    <string name="paper_letter">Letter</string>
+    <string name="include_grid_labels">Include row and column labels</string>
+    <string name="include_legend">Include design legend in image</string>
+    <string name="transparent_background">Transparent PNG background</string>
+    <string name="export_success">File saved.</string>
+    <string name="export_failure">Export failed: %1$s</string>
+    <string name="share_failure">Sharing failed: %1$s</string>
+    <string name="export_loading">Preparing project data…</string>
+    <string name="export_project_missing">This project is no longer available.</string>
+    <string name="share_pdf_chooser">Share SquareTool PDF</string>
+    <string name="share_png_chooser">Share SquareTool image</string>
+    <string name="export_local_privacy">Exports stay local unless you choose a destination or recipient.</string>
+</resources>

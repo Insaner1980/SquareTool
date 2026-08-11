@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_brand_title">SquareTool</string>
+    <string name="home_brand_subtitle">Granny Square</string>
+    <string name="home_search">Search projects</string>
+    <string name="home_close_search">Close search</string>
+    <string name="home_search_hint">Search names and notes</string>
+    <string name="home_search_results">Search results</string>
+    <string name="home_no_search_results">No projects match this search.</string>
+    <string name="home_current_project">Current project</string>
+    <string name="home_project_actions">Project actions</string>
+    <string name="home_open_planner">Open Planner</string>
+    <string name="home_grid_size">Grid: %1$d × %2$d</string>
+    <string name="home_progress">%1$d%% complete</string>
+    <string name="home_view_insights">View Insights</string>
+    <string name="home_edit_project">Edit Project</string>
+    <string name="home_duplicate_project">Duplicate Project</string>
+    <string name="home_add_favorite">Add to favorites</string>
+    <string name="home_remove_favorite">Remove from favorites</string>
+    <string name="home_delete_project">Delete Project</string>
+    <string name="home_recent_projects">Continue where you left off</string>
+    <string name="home_view_all_projects">View all projects</string>
+    <string name="home_new_project">New Project</string>
+    <string name="home_yarn_color_summary">Yarn &amp; Color Summary</string>
+    <string name="home_estimated_skeins">%1$.1f estimated skeins</string>
+    <string name="home_yarn_not_configured">Add yarn settings for a skein estimate.</string>
+    <string name="home_empty_title">Plan your next granny square project</string>
+    <string name="home_empty_body">Create a blanket grid, arrange your saved square designs, and keep the whole visual plan on this device.</string>
+    <string name="home_create_project">Create Project</string>
+    <string name="home_create_sample">Explore Sample Project</string>
+    <string name="home_delete_title">Delete %1$s?</string>
+    <string name="home_delete_body">This removes the project and every saved cell in its blanket layout. This cannot be undone.</string>
+    <string name="home_cancel">Cancel</string>
+    <string name="home_delete">Delete</string>
+    <string name="home_save_failed">The project could not be updated.</string>
+    <plurals name="home_total_squares">
+        <item quantity="one">%d square</item>
+        <item quantity="other">%d squares</item>
+    </plurals>
+    <plurals name="home_color_count">
+        <item quantity="one">%d color</item>
+        <item quantity="other">%d colors</item>
+    </plurals>
+</resources>
