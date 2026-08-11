@@ -17,5 +17,10 @@
   },
   "dependencies": {
     "deepsec": "2.2.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici@8.5.0": "8.10.0"
+    }
   }
 }
