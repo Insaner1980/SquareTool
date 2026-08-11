@@ -19,7 +19,7 @@ androidx-test-runner = "1.7.0"
 espresso = "3.7.0"
 ktlint-gradle = "14.2.0"
 detekt = "2.0.0-alpha.6"
-owasp-dependency-check = "12.2.2"
+owasp-dependency-check = "13.0.0"
 
 [libraries]
 androidx-core = { module = "androidx.core:core", version.ref = "core" }
