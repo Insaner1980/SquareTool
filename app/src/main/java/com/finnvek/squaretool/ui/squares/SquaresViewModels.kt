@@ -9,6 +9,8 @@ import com.finnvek.squaretool.data.local.SquareRoundEntity
 import com.finnvek.squaretool.data.repository.DesignUsage
 import com.finnvek.squaretool.data.repository.SquareToolRepository
 import com.finnvek.squaretool.render.MotifTemplateRegistry
+import com.finnvek.squaretool.ui.moveListItem
+import com.finnvek.squaretool.ui.simpleViewModelFactory
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
 
 sealed interface SquaresNotice {
     data object BuiltInCannotDelete : SquaresNotice
@@ -152,8 +155,8 @@ class SquareEditorViewModel(
     private val duplicate: Boolean,
 ) : ViewModel() {
     private val draft = MutableStateFlow(SquareEditorUiState())
-    private var originalCreatedAt: Long? = null
-    private var gramsPerSquareOverride: Double? = null
+    private val originalCreatedAt = AtomicReference<Long?>(null)
+    private val gramsPerSquareOverride = AtomicReference<Double?>(null)
 
     val uiState =
         combine(draft, repository.observeColors()) { state, colors ->
@@ -164,9 +167,8 @@ class SquareEditorViewModel(
         viewModelScope.launch {
             val colors = repository.getColors()
             val source = designId?.let { repository.getDesignWithRounds(it) }
-            val now = System.currentTimeMillis()
             val shouldDuplicate = duplicate || source?.design?.builtIn == true
-            gramsPerSquareOverride = source?.design?.gramsPerSquareOverride
+            gramsPerSquareOverride.set(source?.design?.gramsPerSquareOverride)
             val initial =
                 if (source == null) {
                     val firstColor = colors.firstOrNull()?.id.orEmpty()
@@ -180,14 +182,14 @@ class SquareEditorViewModel(
                         sourceBuiltIn = false,
                     )
                 } else {
-                    originalCreatedAt = if (shouldDuplicate) null else source.design.createdAt
+                    originalCreatedAt.set(if (shouldDuplicate) null else source.design.createdAt)
                     SquareEditorDraft(
                         id = if (shouldDuplicate) UUID.randomUUID().toString() else source.design.id,
                         name = source.design.name,
                         templateId = source.design.motifTemplateId,
                         roundColorIds = source.rounds.sortedBy { it.roundIndex }.map { it.colorId },
                         notes = source.design.note,
-                        favorite = if (shouldDuplicate) false else source.design.favorite,
+                        favorite = !shouldDuplicate && source.design.favorite,
                         sourceBuiltIn = false,
                     )
                 }
@@ -257,7 +259,7 @@ class SquareEditorViewModel(
         fromIndex: Int,
         toIndex: Int,
     ) = updateDraft {
-        copy(roundColorIds = moveItem(roundColorIds, fromIndex, toIndex))
+        copy(roundColorIds = moveListItem(roundColorIds, fromIndex, toIndex))
     }
 
     fun createAndAssignColor(
@@ -311,8 +313,8 @@ class SquareEditorViewModel(
                         template.category.name
                             .lowercase()
                             .replaceFirstChar(Char::titlecase),
-                    gramsPerSquareOverride = gramsPerSquareOverride,
-                    createdAt = originalCreatedAt ?: now,
+                    gramsPerSquareOverride = gramsPerSquareOverride.get(),
+                    createdAt = originalCreatedAt.get() ?: now,
                     updatedAt = now,
                 )
             val rounds =
@@ -344,12 +346,3 @@ class SquareEditorViewModel(
             }
     }
 }
-
-internal inline fun <reified T : ViewModel> simpleViewModelFactory(crossinline create: () -> T): ViewModelProvider.Factory =
-    object : ViewModelProvider.Factory {
-        override fun <VM : ViewModel> create(modelClass: Class<VM>): VM {
-            require(modelClass.isAssignableFrom(T::class.java))
-            @Suppress("UNCHECKED_CAST")
-            return create() as VM
-        }
-    }

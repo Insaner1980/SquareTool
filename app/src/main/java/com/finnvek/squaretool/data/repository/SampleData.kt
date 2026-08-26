@@ -22,6 +22,7 @@ internal data class SampleData(
 internal object SampleDataFactory {
     const val PROJECT_ID = "sample-project-autumn-garden"
     private const val PALETTE_ID = "sample-palette-autumn-garden"
+    private const val MOSS_GREEN = "Moss Green"
 
     fun create(now: Long): SampleData {
         val colors =
@@ -29,7 +30,7 @@ internal object SampleDataFactory {
                 color("cream", "Cream", 0xFFF3E6C9, now),
                 color("mustard", "Mustard", 0xFFD99A1E, now),
                 color("rust", "Rust", 0xFFC9531A, now),
-                color("moss", "Moss Green", 0xFF6B7A2C, now),
+                color("moss", MOSS_GREEN, 0xFF6B7A2C, now),
                 color("sage", "Sage", 0xFF9BA77A, now),
                 color("blush", "Blush", 0xFFD98F8E, now),
                 color("chocolate", "Chocolate", 0xFF4B2D18, now),
@@ -37,12 +38,12 @@ internal object SampleDataFactory {
         val ids = colors.associate { it.name to it.id }
         val designs =
             listOf(
-                design("sunburst", "Sunburst", "sunburst", listOf("Mustard", "Cream", "Rust", "Moss Green", "Chocolate"), ids, now),
+                design("sunburst", "Sunburst", "sunburst", listOf("Mustard", "Cream", "Rust", MOSS_GREEN, "Chocolate"), ids, now),
                 design(
                     "olive-bloom",
                     "Olive Bloom",
                     "flower_medallion",
-                    listOf("Moss Green", "Cream", "Blush", "Sage", "Chocolate"),
+                    listOf(MOSS_GREEN, "Cream", "Blush", "Sage", "Chocolate"),
                     ids,
                     now,
                 ),
@@ -50,7 +51,7 @@ internal object SampleDataFactory {
                     "harvest-star",
                     "Harvest Star",
                     "star_bloom",
-                    listOf("Moss Green", "Mustard", "Cream", "Rust", "Chocolate", "Cream"),
+                    listOf(MOSS_GREEN, "Mustard", "Cream", "Rust", "Chocolate", "Cream"),
                     ids,
                     now,
                 ),
@@ -59,7 +60,7 @@ internal object SampleDataFactory {
                     "maple-mist",
                     "Maple Mist",
                     "classic_granny",
-                    listOf("Rust", "Cream", "Moss Green", "Mustard", "Sage", "Chocolate"),
+                    listOf("Rust", "Cream", MOSS_GREEN, "Mustard", "Sage", "Chocolate"),
                     ids,
                     now,
                 ),
@@ -67,7 +68,7 @@ internal object SampleDataFactory {
                     "woodland-petal",
                     "Woodland Petal",
                     "corner_accent",
-                    listOf("Cream", "Sage", "Moss Green", "Mustard", "Chocolate"),
+                    listOf("Cream", "Sage", MOSS_GREEN, "Mustard", "Chocolate"),
                     ids,
                     now,
                 ),

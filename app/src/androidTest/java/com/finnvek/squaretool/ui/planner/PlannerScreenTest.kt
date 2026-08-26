@@ -63,7 +63,7 @@ class PlannerScreenTest {
                             ),
                         ),
                     selectedCoordinate = null,
-                    onCellSelected = { selected = it },
+                    onSelectCell = { selected = it },
                 )
             }
         }

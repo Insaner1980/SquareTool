@@ -192,6 +192,7 @@ object MotifGeometryPlanner {
         }
     }
 
+    // CPD-OFF
     private fun sunburst(
         roundCount: Int,
         detail: MotifRenderDetail,
@@ -214,6 +215,7 @@ object MotifGeometryPlanner {
             add(MotifPrimitive.Circle(0, 0.5f, 0.5f, 0.09f, 0.008f))
         }
     }
+    // CPD-ON
 
     private fun daisy(
         roundCount: Int,
@@ -274,13 +276,9 @@ object MotifGeometryPlanner {
         detail: MotifRenderDetail,
     ): List<MotifPrimitive> =
         buildList {
-            add(outerSquare(roundCount))
-            val innerLayerCount = roundCount - 1
-            for (roundIndex in roundCount - 2 downTo 0) {
-                val depth = (roundCount - 2) - roundIndex
-                val fraction = fraction(depth, innerLayerCount - 1)
-                val radius = lerp(0.41f, 0.11f, fraction)
-                add(
+            addAll(
+                layeredMotif(roundCount) { roundIndex, fraction ->
+                    val radius = lerp(0.41f, 0.11f, fraction)
                     MotifPrimitive.Polygon(
                         roundIndex = roundIndex,
                         points =
@@ -291,9 +289,9 @@ object MotifGeometryPlanner {
                                 rotationDegrees = if (roundIndex % 2 == 0) -90f else -67.5f,
                             ),
                         outlineWidth = lerp(0.011f, 0.007f, fraction),
-                    ),
-                )
-            }
+                    )
+                },
+            )
             if (detail == MotifRenderDetail.FULL) {
                 addAll(petalRing(1, roundCount, 8, 22.5f, 0.08f, 0.14f))
             }
@@ -304,12 +302,8 @@ object MotifGeometryPlanner {
         detail: MotifRenderDetail,
     ): List<MotifPrimitive> =
         buildList {
-            add(outerSquare(roundCount))
-            val innerLayerCount = roundCount - 1
-            for (roundIndex in roundCount - 2 downTo 0) {
-                val depth = (roundCount - 2) - roundIndex
-                val fraction = fraction(depth, innerLayerCount - 1)
-                add(
+            addAll(
+                layeredMotif(roundCount) { roundIndex, fraction ->
                     MotifPrimitive.Diamond(
                         roundIndex = roundIndex,
                         centerX = 0.5f,
@@ -318,9 +312,9 @@ object MotifGeometryPlanner {
                         rotationDegrees = if (roundIndex % 2 == 0) 45f else 0f,
                         cornerRadius = lerp(0.045f, 0.025f, fraction),
                         outlineWidth = lerp(0.011f, 0.007f, fraction),
-                    ),
-                )
-            }
+                    )
+                },
+            )
             if (detail == MotifRenderDetail.FULL) {
                 val cornerRound = (roundCount - 2).coerceAtLeast(0)
                 listOf(0.14f to 0.14f, 0.86f to 0.14f, 0.14f to 0.86f, 0.86f to 0.86f).forEach { (x, y) ->
@@ -392,23 +386,29 @@ object MotifGeometryPlanner {
             )
         }
 
-    private fun concentricCircles(roundCount: Int): List<MotifPrimitive> =
+    private fun layeredMotif(
+        roundCount: Int,
+        createPrimitive: (roundIndex: Int, fraction: Float) -> MotifPrimitive,
+    ): List<MotifPrimitive> =
         buildList {
             add(outerSquare(roundCount))
             val innerLayerCount = roundCount - 1
             for (roundIndex in roundCount - 2 downTo 0) {
                 val depth = (roundCount - 2) - roundIndex
                 val fraction = fraction(depth, innerLayerCount - 1)
-                add(
-                    MotifPrimitive.Circle(
-                        roundIndex = roundIndex,
-                        centerX = 0.5f,
-                        centerY = 0.5f,
-                        radius = lerp(0.40f, 0.10f, fraction),
-                        outlineWidth = lerp(0.011f, 0.007f, fraction),
-                    ),
-                )
+                add(createPrimitive(roundIndex, fraction))
             }
+        }
+
+    private fun concentricCircles(roundCount: Int): List<MotifPrimitive> =
+        layeredMotif(roundCount) { roundIndex, fraction ->
+            MotifPrimitive.Circle(
+                roundIndex = roundIndex,
+                centerX = 0.5f,
+                centerY = 0.5f,
+                radius = lerp(0.40f, 0.10f, fraction),
+                outlineWidth = lerp(0.011f, 0.007f, fraction),
+            )
         }
 
     private fun outerSquare(roundCount: Int) =

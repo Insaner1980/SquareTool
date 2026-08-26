@@ -11,6 +11,7 @@ import com.finnvek.squaretool.domain.algorithm.MeasurementCalculator
 import com.finnvek.squaretool.domain.algorithm.ProgressCalculator
 import com.finnvek.squaretool.domain.model.GridSize
 import com.finnvek.squaretool.domain.model.MeasurementUnit
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.OutputStream
@@ -29,12 +30,13 @@ data class PdfExportOptions(
 
 class ProjectPdfExporter(
     private val context: Context,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     suspend fun write(
         snapshot: ProjectExportSnapshot,
         output: OutputStream,
         options: PdfExportOptions = PdfExportOptions(),
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(ioDispatcher) {
         val document = PdfDocument()
         try {
             val pageSize = resolvePageSize(snapshot, options.paperSize)
@@ -104,6 +106,7 @@ class ProjectPdfExporter(
         document.finishPage(page)
     }
 
+    @Suppress("kotlin:S3776") // Pagination and drawing form one ordered PDF operation.
     private fun drawMaterialsPages(
         document: PdfDocument,
         pageSize: PageSize,

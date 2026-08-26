@@ -2,6 +2,7 @@ package com.finnvek.squaretool.ui.squares
 
 import com.finnvek.squaretool.data.local.ColorEntity
 import com.finnvek.squaretool.data.local.SquareDesignEntity
+import com.finnvek.squaretool.ui.moveListItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -66,7 +67,7 @@ class SquaresModelsTest {
 
     @Test
     fun reorderMovesOneRoundWithoutDroppingDuplicates() {
-        val reordered = moveItem(listOf("olive", "cream", "olive", "rust"), fromIndex = 3, toIndex = 1)
+        val reordered = moveListItem(listOf("olive", "cream", "olive", "rust"), fromIndex = 3, toIndex = 1)
 
         assertEquals(listOf("olive", "rust", "cream", "olive"), reordered)
     }

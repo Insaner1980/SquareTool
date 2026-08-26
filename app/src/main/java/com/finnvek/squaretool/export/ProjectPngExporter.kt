@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import androidx.core.graphics.createBitmap
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.OutputStream
@@ -18,12 +19,14 @@ data class PngExportOptions(
     val includeLabels: Boolean = false,
 )
 
-class ProjectPngExporter {
+class ProjectPngExporter(
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) {
     suspend fun write(
         snapshot: ProjectExportSnapshot,
         output: OutputStream,
         options: PngExportOptions = PngExportOptions(),
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(ioDispatcher) {
         val blanketSize =
             ExportPolicy.bitmapSize(
                 rows = snapshot.project.rows,

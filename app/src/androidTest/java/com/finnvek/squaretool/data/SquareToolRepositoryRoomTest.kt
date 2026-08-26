@@ -84,6 +84,7 @@ class SquareToolRepositoryRoomTest {
             assertEquals("Design", repository.getDesign("design-1")?.name)
         }
 
+    // CPD-OFF
     @Test
     fun referencedDesignCannotBeDeletedSilently() =
         runTest {
@@ -97,6 +98,7 @@ class SquareToolRepositoryRoomTest {
             assertEquals(false, deleted)
             assertEquals("design-1", repository.getProjectCells("project-1").single().squareDesignId)
         }
+    // CPD-ON
 
     @Test
     fun paletteColorsAreReturnedInDisplayOrder() =
@@ -189,6 +191,7 @@ class SquareToolRepositoryRoomTest {
             assertEquals(1234L, repository.getProject("project-1")?.lastOpenedAt)
         }
 
+    // CPD-OFF
     @Test
     fun usageCountsPreventDeletingReferencedDesignAndColor() =
         runTest {
@@ -203,6 +206,7 @@ class SquareToolRepositoryRoomTest {
             assertEquals(false, repository.deleteDesignIfUnused("design-1"))
             assertEquals(false, repository.deleteColorIfUnused("color-1"))
         }
+    // CPD-ON
 
     @Test
     fun sampleProjectUsesProductionTablesAndSpecifiedCounts() =

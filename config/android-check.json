@@ -14,6 +14,7 @@
   ],
   "buildTasks": [":app:assembleDebug"],
   "testTasks": [":app:testDebugUnitTest"],
+  "deviceTestTasks": [":app:connectedDebugAndroidTest"],
   "includedBuilds": [],
   "checks": {
     "dependabotEnabled": true,
@@ -21,7 +22,7 @@
     "detektTasks": [":app:detekt"],
     "lintTasks": [":app:lintDebug"],
     "fullLintTasks": [":app:lintDebug", ":app:lintRelease"],
-    "stabilityTasks": [],
+    "stabilityTasks": [":app:stabilityCheck"],
     "dependencyConfigurations": ["debugRuntimeClasspath", "releaseRuntimeClasspath"],
     "dependencyCheckTasks": [":app:dependencyCheckAnalyze"],
     "semgrepConfig": "config/semgrep/squaretool-security.yml"

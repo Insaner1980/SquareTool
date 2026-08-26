@@ -34,6 +34,7 @@ import com.finnvek.squaretool.R
 import com.finnvek.squaretool.backup.BackupService
 import com.finnvek.squaretool.backup.SquareToolBackupDto
 import com.finnvek.squaretool.ui.theme.SquareToolSpacing
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,6 +46,8 @@ fun BackupRestoreScreen(
     service: BackupService,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -60,8 +63,8 @@ fun BackupRestoreScreen(
             if (uri != null) {
                 scope.launch {
                     runCatching {
-                        val json = withContext(Dispatchers.IO) { service.createJson() }
-                        withContext(Dispatchers.IO) {
+                        val json = service.createJson()
+                        withContext(ioDispatcher) {
                             requireNotNull(context.contentResolver.openOutputStream(uri)).bufferedWriter().use { it.write(json) }
                         }
                     }.onSuccess { snackbar.showSnackbar(backupCreated) }
@@ -75,10 +78,10 @@ fun BackupRestoreScreen(
                 scope.launch {
                     runCatching {
                         val json =
-                            withContext(Dispatchers.IO) {
+                            withContext(ioDispatcher) {
                                 requireNotNull(context.contentResolver.openInputStream(uri)).bufferedReader().use { it.readText() }
                             }
-                        withContext(Dispatchers.Default) { service.decodeAndValidate(json) }
+                        withContext(defaultDispatcher) { service.decodeAndValidate(json) }
                     }.onSuccess { pendingRestore = it }
                         .onFailure { snackbar.showSnackbar(restoreFailed.format(it.message ?: it::class.simpleName.orEmpty())) }
                 }

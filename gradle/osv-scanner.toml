@@ -1,0 +1,4 @@
+[[IgnoredVulns]]
+id = "GHSA-r937-wjx7-w2jp"
+ignoreUntil = 2026-10-01
+reason = "CVE-2026-53914 affects Kotlin build-cache metadata; Kotlin caching is disabled until a stable patched Kotlin release is available."

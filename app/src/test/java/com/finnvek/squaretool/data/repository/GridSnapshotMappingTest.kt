@@ -31,7 +31,6 @@ class GridSnapshotMappingTest {
         columnCount = columns,
         squareWidthValue = null,
         squareHeightValue = null,
-        measurementUnit = "centimeters",
         joiningGapValue = null,
         trackingEnabled = true,
         favorite = false,
@@ -45,5 +44,6 @@ class GridSnapshotMappingTest {
         skeinWeightGrams = null,
         joiningAndEdgingBufferPercent = 10.0,
         demoProject = false,
+        measurementUnit = "centimeters",
     )
 }

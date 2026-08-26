@@ -59,21 +59,21 @@ fun SettingsRoute(
     onOpenAccessiblePlanner: () -> Unit,
     onDeleteAllData: suspend () -> Unit,
     modifier: Modifier = Modifier,
+    settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory(repository)),
 ) {
-    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory(repository))
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by settingsViewModel.uiState.collectAsStateWithLifecycle()
     SettingsScreen(
         state = state,
-        onThemeChange = viewModel::setTheme,
-        onUnitChange = viewModel::setUnit,
-        onReduceMotionChange = viewModel::setReduceMotion,
-        onHapticsChange = viewModel::setHaptics,
-        onGridLinesChange = viewModel::setGridLines,
-        onConfirmLayoutChange = viewModel::setConfirmLayout,
-        onPreserveCompletedChange = viewModel::setPreserveCompleted,
-        onShowLocksChange = viewModel::setShowLocks,
-        onBufferChange = viewModel::setBuffer,
-        onSkeinWeightChange = viewModel::setSkeinWeight,
+        onThemeChange = settingsViewModel::setTheme,
+        onUnitChange = settingsViewModel::setUnit,
+        onReduceMotionChange = settingsViewModel::setReduceMotion,
+        onHapticsChange = settingsViewModel::setHaptics,
+        onGridLinesChange = settingsViewModel::setGridLines,
+        onConfirmLayoutChange = settingsViewModel::setConfirmLayout,
+        onPreserveCompletedChange = settingsViewModel::setPreserveCompleted,
+        onShowLocksChange = settingsViewModel::setShowLocks,
+        onBufferChange = settingsViewModel::setBuffer,
+        onSkeinWeightChange = settingsViewModel::setSkeinWeight,
         onOpenBackup = onOpenBackup,
         onOpenAbout = onOpenAbout,
         onOpenAccessiblePlanner = onOpenAccessiblePlanner,
@@ -82,6 +82,7 @@ fun SettingsRoute(
     )
 }
 
+@Suppress("kotlin:S107") // Settings actions remain explicit and type-safe at the screen boundary.
 @Composable
 fun SettingsScreen(
     state: SettingsUiState,
@@ -258,23 +259,25 @@ private fun ScreenTitle(text: String) {
 
 @Composable
 private fun SectionTitle(text: String) {
-    Text(
-        text,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = SquareToolSpacing.Standard,
-                    end = SquareToolSpacing.Standard,
-                    top = SquareToolSpacing.Section,
-                    bottom = SquareToolSpacing.Small,
-                ).semantics {
-                    heading()
-                },
-        style = MaterialTheme.typography.titleLarge,
-        color = MaterialTheme.colorScheme.primary,
-    )
-    HorizontalDivider()
+    Column {
+        Text(
+            text,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = SquareToolSpacing.Standard,
+                        end = SquareToolSpacing.Standard,
+                        top = SquareToolSpacing.Section,
+                        bottom = SquareToolSpacing.Small,
+                    ).semantics {
+                        heading()
+                    },
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        HorizontalDivider()
+    }
 }
 
 @Composable

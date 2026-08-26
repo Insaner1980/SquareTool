@@ -5,6 +5,7 @@ import com.finnvek.squaretool.data.local.ProjectCellEntity
 import com.finnvek.squaretool.data.local.ProjectEntity
 import com.finnvek.squaretool.data.local.SquareDesignWithRounds
 import com.finnvek.squaretool.data.local.SquareRoundEntity
+import com.finnvek.squaretool.data.repository.toGridSnapshot
 import com.finnvek.squaretool.domain.algorithm.ColorUsageCalculator
 import com.finnvek.squaretool.domain.algorithm.DesignDistributionCalculator
 import com.finnvek.squaretool.domain.algorithm.MeasurementCalculator
@@ -19,7 +20,6 @@ import com.finnvek.squaretool.domain.model.YarnSettings
 import com.finnvek.squaretool.render.MotifTemplateRegistry
 import com.finnvek.squaretool.ui.projects.ProjectCardModel
 import com.finnvek.squaretool.ui.projects.buildProjectCardModel
-import com.finnvek.squaretool.ui.projects.toSnapshot
 
 data class DesignUsageItem(
     val designId: String,
@@ -56,7 +56,7 @@ fun buildInsightsModel(
     colors: List<ColorEntity>,
     palette: List<ColorEntity>,
 ): InsightsModel {
-    val snapshot = project.toSnapshot(cells)
+    val snapshot = project.toGridSnapshot(cells)
     val colorsById = colors.associateBy(ColorEntity::id)
     val designsById = designs.associateBy { it.design.id }
     val profiles =

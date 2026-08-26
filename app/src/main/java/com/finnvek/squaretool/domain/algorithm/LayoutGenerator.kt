@@ -1,5 +1,6 @@
 package com.finnvek.squaretool.domain.algorithm
 
+import android.annotation.SuppressLint
 import com.finnvek.squaretool.domain.model.CellCoordinate
 import com.finnvek.squaretool.domain.model.CellState
 import com.finnvek.squaretool.domain.model.GradientDirection
@@ -69,6 +70,8 @@ data class GenerationResult(
     val changedCellCount: Int,
 )
 
+// The seeded PRNG produces reproducible visual layouts and is never used for security decisions.
+@SuppressLint("WeakPrng")
 object LayoutGenerator {
     fun generate(request: GenerationRequest): GenerationResult {
         val original = request.snapshot
@@ -205,7 +208,7 @@ object LayoutGenerator {
         avoidNeighbors: Boolean,
     ) {
         val random = Random(seed)
-        val order = coordinates.toMutableList().also { shuffle(it, random) }
+        val order = shuffled(coordinates, random)
         order.forEach { coordinate ->
             val candidates =
                 if (avoidNeighbors) {
@@ -229,7 +232,7 @@ object LayoutGenerator {
     ) {
         val random = Random(seed)
         val remaining = balancedEligibleTargets(coordinates.size, designs, preservedCounts).toMutableMap()
-        val order = coordinates.toMutableList().also { shuffle(it, random) }
+        val order = shuffled(coordinates, random)
         order.forEach { coordinate ->
             val available = designs.filter { remaining.getOrDefault(it.designId, 0) > 0 }
             if (available.isEmpty()) return@forEach
@@ -242,7 +245,7 @@ object LayoutGenerator {
             val conflictFree = available.filterNot { it.designId in neighborIds }
             val candidates = conflictFree.ifEmpty { available }
             val highestRemaining = candidates.maxOf { remaining.getValue(it.designId) }
-            val mostNeeded = candidates.filter { remaining.getValue(it.designId) == highestRemaining }.toMutableList()
+            val mostNeeded = candidates.filter { remaining.getValue(it.designId) == highestRemaining }
             val chosen = mostNeeded[random.nextInt(mostNeeded.size)]
             assignments[coordinate] = chosen.designId
             remaining[chosen.designId] = remaining.getValue(chosen.designId) - 1
@@ -284,7 +287,7 @@ object LayoutGenerator {
         if (total == 0) return designs.associate { it.designId to 0 }
         val totalWeight = designs.sumOf(WeightedDesign::weight)
         val raw = designs.map { total * it.weight / totalWeight }
-        val counts = raw.map { floor(it).toInt() }.toMutableList()
+        val counts = raw.map { floor(it).toInt() }.toIntArray()
         var remainder = total - counts.sum()
         val remainderOrder =
             designs.indices.sortedWith(
@@ -538,16 +541,18 @@ object LayoutGenerator {
         )
     }
 
-    private fun <T> shuffle(
-        values: MutableList<T>,
+    private fun <T> shuffled(
+        source: List<T>,
         random: Random,
-    ) {
+    ): List<T> {
+        val values = source.toMutableList()
         for (index in values.lastIndex downTo 1) {
             val swapIndex = random.nextInt(index + 1)
             val value = values[index]
             values[index] = values[swapIndex]
             values[swapIndex] = value
         }
+        return values
     }
 
     private const val OPTIMIZATION_SEED_SALT = -7_046_029_254_386_353_131L

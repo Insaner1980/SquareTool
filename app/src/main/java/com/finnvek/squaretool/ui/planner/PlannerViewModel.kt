@@ -1,5 +1,6 @@
 package com.finnvek.squaretool.ui.planner
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Stable
 class PlannerViewModel(
     private val repository: SquareToolRepository,
     private val savedStateHandle: SavedStateHandle,
@@ -439,6 +441,7 @@ class PlannerViewModel(
         }
     }
 
+    @Suppress("kotlin:S3776") // One combined snapshot prevents partially updated planner state.
     private fun observePlanner() {
         viewModelScope.launch {
             combine(

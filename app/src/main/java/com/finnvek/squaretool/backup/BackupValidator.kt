@@ -3,6 +3,9 @@ package com.finnvek.squaretool.backup
 import com.finnvek.squaretool.render.MotifTemplateRegistry
 
 object BackupValidator {
+    private const val MISSING_DESIGN = "Referenced square design does not exist"
+    private const val MISSING_COLOR = "Referenced color does not exist"
+
     fun validate(backup: SquareToolBackupDto): BackupValidationResult {
         val errors = mutableListOf<BackupValidationError>()
 
@@ -27,10 +30,10 @@ object BackupValidator {
         validateIds("colors", backup.colors.map { it.id }, errors)
         validateIds("palettes", backup.palettes.map { it.id }, errors)
 
-        val projectIds = backup.projects.mapTo(mutableSetOf()) { it.id }
-        val designIds = backup.squareDesigns.mapTo(mutableSetOf()) { it.id }
-        val colorIds = backup.colors.mapTo(mutableSetOf()) { it.id }
-        val paletteIds = backup.palettes.mapTo(mutableSetOf()) { it.id }
+        val projectIds = backup.projects.map { it.id }.toSet()
+        val designIds = backup.squareDesigns.map { it.id }.toSet()
+        val colorIds = backup.colors.map { it.id }.toSet()
+        val paletteIds = backup.palettes.map { it.id }.toSet()
 
         backup.projects.forEachIndexed { index, project ->
             val path = "projects[$index]"
@@ -61,7 +64,7 @@ object BackupValidator {
                 error(
                     BackupValidationCode.MISSING_REFERENCE,
                     "$path.defaultSquareDesignId",
-                    "Referenced square design does not exist",
+                    MISSING_DESIGN,
                 )
             }
         }
@@ -149,7 +152,7 @@ object BackupValidator {
                     BackupValidationError(
                         BackupValidationCode.MISSING_REFERENCE,
                         "$path.squareDesignId",
-                        "Referenced square design does not exist",
+                        MISSING_DESIGN,
                     )
             }
             if (round.colorId !in colorIds) {
@@ -157,7 +160,7 @@ object BackupValidator {
                     BackupValidationError(
                         BackupValidationCode.MISSING_REFERENCE,
                         "$path.colorId",
-                        "Referenced color does not exist",
+                        MISSING_COLOR,
                     )
             }
         }
@@ -217,7 +220,7 @@ object BackupValidator {
                     BackupValidationError(
                         BackupValidationCode.MISSING_REFERENCE,
                         "paletteColors[$index].colorId",
-                        "Referenced color does not exist",
+                        MISSING_COLOR,
                     )
             }
         }
@@ -248,7 +251,7 @@ object BackupValidator {
                     BackupValidationError(
                         BackupValidationCode.MISSING_REFERENCE,
                         "projectPalettes[$index].colorId",
-                        "Referenced color does not exist",
+                        MISSING_COLOR,
                     )
             }
         }
@@ -334,7 +337,7 @@ object BackupValidator {
                     BackupValidationError(
                         BackupValidationCode.MISSING_REFERENCE,
                         "$path.squareDesignId",
-                        "Referenced square design does not exist",
+                        MISSING_DESIGN,
                     )
             }
             validateOptionalPositive(cell.gramsPerSquareOverride, "$path.gramsPerSquareOverride", errors)

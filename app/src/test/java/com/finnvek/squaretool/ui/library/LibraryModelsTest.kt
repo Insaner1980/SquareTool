@@ -1,5 +1,6 @@
 package com.finnvek.squaretool.ui.library
 
+import com.finnvek.squaretool.ui.moveListItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -44,7 +45,7 @@ class LibraryModelsTest {
 
     @Test
     fun paletteReorderRetainsEveryColorExactlyOnce() {
-        val reordered = movePaletteColor(listOf("olive", "cream", "rust"), 0, 2)
+        val reordered = moveListItem(listOf("olive", "cream", "rust"), 0, 2)
 
         assertEquals(listOf("cream", "rust", "olive"), reordered)
         assertFalse(reordered.toSet().size != reordered.size)

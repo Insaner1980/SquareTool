@@ -111,12 +111,3 @@ data class PaletteEditorDraft(
 ) {
     val isValid: Boolean get() = name.isNotBlank() && colorIds.isNotEmpty() && colorIds.distinct().size == colorIds.size
 }
-
-fun <T> movePaletteColor(
-    values: List<T>,
-    fromIndex: Int,
-    toIndex: Int,
-): List<T> {
-    if (fromIndex !in values.indices || toIndex !in values.indices || fromIndex == toIndex) return values
-    return values.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
-}

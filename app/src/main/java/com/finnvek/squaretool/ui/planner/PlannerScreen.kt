@@ -12,6 +12,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -86,6 +87,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -129,6 +131,7 @@ import com.finnvek.squaretool.ui.theme.SquareToolSpacing
 import java.util.Locale
 import kotlin.math.roundToInt
 
+@Suppress("kotlin:S107") // Route callbacks expose planner operations as independently typed actions.
 @Composable
 fun PlannerRoute(
     projectId: String,
@@ -141,6 +144,11 @@ fun PlannerRoute(
     modifier: Modifier = Modifier,
     startAccessible: Boolean = false,
     initialDesignId: String? = null,
+    plannerViewModel: PlannerViewModel =
+        viewModel(
+            key = "planner-$projectId",
+            factory = PlannerViewModel.factory(repository, projectId),
+        ),
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val signalEdit: () -> Unit = {
@@ -148,11 +156,6 @@ fun PlannerRoute(
             hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
     }
-    val plannerViewModel: PlannerViewModel =
-        viewModel(
-            key = "planner-$projectId",
-            factory = PlannerViewModel.factory(repository, projectId),
-        )
     val state by plannerViewModel.state.collectAsStateWithLifecycle()
     val settingsPolicy =
         remember(
@@ -198,8 +201,8 @@ fun PlannerRoute(
             plannerViewModel.toggleSelectedCompletion()
             signalEdit()
         },
-        onClearSelected = plannerViewModel::clearSelectedCell,
-        onClearUnlocked = plannerViewModel::clearUnlockedCells,
+        onClearSelection = plannerViewModel::clearSelectedCell,
+        onClearUnlockedCells = plannerViewModel::clearUnlockedCells,
         onUndo = plannerViewModel::undo,
         onRedo = plannerViewModel::redo,
         onSetAccessibleMode = plannerViewModel::setAccessibleGridMode,
@@ -209,17 +212,18 @@ fun PlannerRoute(
         onSetGeneratorSeed = plannerViewModel::setGeneratorSeed,
         onSetBandWidth = plannerViewModel::setGeneratorBandWidth,
         onSetAvoidNeighbors = plannerViewModel::setAvoidNeighbors,
-        onSetOverwriteCompleted = plannerViewModel::setOverwriteCompleted,
+        onSetOverwriteCompletedCells = plannerViewModel::setOverwriteCompleted,
         onToggleGeneratorDesign = plannerViewModel::toggleGeneratorDesign,
         onAdjustGeneratorWeight = plannerViewModel::adjustGeneratorWeight,
         onMoveGeneratorDesign = plannerViewModel::moveGeneratorDesign,
         onGenerate = plannerViewModel::generateLayout,
         onRegenerate = plannerViewModel::regenerateLayout,
-        onApplyGenerated = plannerViewModel::applyGeneratedLayout,
+        onApplyGeneratedLayout = plannerViewModel::applyGeneratedLayout,
         modifier = modifier,
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Planner state and actions stay explicit across mutually exclusive UI branches.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlannerScreen(
@@ -238,8 +242,8 @@ fun PlannerScreen(
     onCancelToolDrag: () -> Unit,
     onToggleLock: () -> Unit,
     onToggleCompletion: () -> Unit,
-    onClearSelected: () -> Unit,
-    onClearUnlocked: () -> Unit,
+    onClearSelection: () -> Unit,
+    onClearUnlockedCells: () -> Unit,
     onUndo: () -> Unit,
     onRedo: () -> Unit,
     onSetAccessibleMode: (Boolean) -> Unit,
@@ -249,13 +253,13 @@ fun PlannerScreen(
     onSetGeneratorSeed: (String) -> Unit,
     onSetBandWidth: (Int) -> Unit,
     onSetAvoidNeighbors: (Boolean) -> Unit,
-    onSetOverwriteCompleted: (Boolean) -> Unit,
+    onSetOverwriteCompletedCells: (Boolean) -> Unit,
     onToggleGeneratorDesign: (String) -> Unit,
     onAdjustGeneratorWeight: (String, Double) -> Unit,
     onMoveGeneratorDesign: (String, Int) -> Unit,
     onGenerate: () -> Unit,
     onRegenerate: () -> Unit,
-    onApplyGenerated: () -> Unit,
+    onApplyGeneratedLayout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var overflowOpen by remember { mutableStateOf(false) }
@@ -354,7 +358,7 @@ fun PlannerScreen(
                                 selectedCoordinate = state.selectedCoordinate,
                                 showLockMarkers = settingsPolicy.showLockMarkers,
                                 showCompletionMarkers = state.trackingEnabled,
-                                onCellSelected = onSelectCell,
+                                onSelectCell = onSelectCell,
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
@@ -368,7 +372,7 @@ fun PlannerScreen(
                                 showGridLines = settingsPolicy.showGridLines,
                                 showLockMarkers = settingsPolicy.showLockMarkers,
                                 showCompletionMarkers = state.trackingEnabled,
-                                onScaleChanged = { canvasScale = it },
+                                onScaleChange = { canvasScale = it },
                                 onSelectCell = onSelectCell,
                                 onBeginToolDrag = onBeginToolDrag,
                                 onApplyToolDuringDrag = onApplyToolDuringDrag,
@@ -398,7 +402,7 @@ fun PlannerScreen(
                         onFit = {
                             canvasCommand = PlannerViewportCommand.Fit(++canvasCommandId)
                         },
-                        onClearUnlocked = { showClearConfirmation = true },
+                        onClearUnlockedCells = { showClearConfirmation = true },
                     )
 
                     PlannerInspector(
@@ -406,7 +410,7 @@ fun PlannerScreen(
                         onAssignDesign = onAssignSelectedDesign,
                         onToggleLock = onToggleLock,
                         onToggleCompletion = onToggleCompletion,
-                        onClearSelected = onClearSelected,
+                        onClearSelection = onClearSelection,
                     )
 
                     SaveStatus(state)
@@ -426,7 +430,7 @@ fun PlannerScreen(
             onSetSeed = onSetGeneratorSeed,
             onSetBandWidth = onSetBandWidth,
             onSetAvoidNeighbors = onSetAvoidNeighbors,
-            onSetOverwriteCompleted = onSetOverwriteCompleted,
+            onSetOverwriteCompletedCells = onSetOverwriteCompletedCells,
             onToggleDesign = onToggleGeneratorDesign,
             onAdjustWeight = onAdjustGeneratorWeight,
             onMoveDesign = onMoveGeneratorDesign,
@@ -445,7 +449,7 @@ fun PlannerScreen(
                 ) {
                     showGenerationConfirmation = true
                 } else {
-                    onApplyGenerated()
+                    onApplyGeneratedLayout()
                 }
             },
         )
@@ -469,7 +473,7 @@ fun PlannerScreen(
                     enabled = state.clearableCount > 0,
                     onClick = {
                         showClearConfirmation = false
-                        onClearUnlocked()
+                        onClearUnlockedCells()
                     },
                 ) {
                     Text(stringResource(R.string.planner_confirm_clear_action))
@@ -492,7 +496,7 @@ fun PlannerScreen(
                 TextButton(
                     onClick = {
                         showGenerationConfirmation = false
-                        onApplyGenerated()
+                        onApplyGeneratedLayout()
                     },
                 ) {
                     Text(stringResource(R.string.planner_confirm_generation_action))
@@ -598,8 +602,9 @@ private fun PlannerSummaryCard(state: PlannerUiState) {
     }
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Toolbars expose independent planner tools and contextual controls.
 @Composable
-private fun PlannerToolbars(
+private fun ColumnScope.PlannerToolbars(
     state: PlannerUiState,
     scale: Float,
     canvasEnabled: Boolean,
@@ -612,7 +617,7 @@ private fun PlannerToolbars(
     onZoomOut: () -> Unit,
     onZoomIn: () -> Unit,
     onFit: () -> Unit,
-    onClearUnlocked: () -> Unit,
+    onClearUnlockedCells: () -> Unit,
 ) {
     val selected = state.selectedCell
     LazyRow(
@@ -712,7 +717,7 @@ private fun PlannerToolbars(
                 enabled = state.clearableCount > 0,
                 label = stringResource(R.string.planner_clear_unlocked),
                 icon = { Icon(Icons.Default.ClearAll, null) },
-                onClick = onClearUnlocked,
+                onClick = onClearUnlockedCells,
                 testTag = "planner_clear_unlocked",
             )
         }
@@ -794,13 +799,14 @@ private fun PlannerToolChip(
     )
 }
 
+@Suppress("kotlin:S3776") // Inspector branches mirror the selected cell and project configuration.
 @Composable
 private fun PlannerInspector(
     state: PlannerUiState,
     onAssignDesign: (String?) -> Unit,
     onToggleLock: () -> Unit,
     onToggleCompletion: () -> Unit,
-    onClearSelected: () -> Unit,
+    onClearSelection: () -> Unit,
 ) {
     val cell = state.selectedCell ?: return
     Card(
@@ -903,7 +909,7 @@ private fun PlannerInspector(
             }
             TextButton(
                 enabled = !cell.locked && (cell.designId != null || cell.completed),
-                onClick = onClearSelected,
+                onClick = onClearSelection,
                 modifier = Modifier.heightIn(min = 48.dp),
             ) {
                 Text(stringResource(R.string.planner_clear_cell))
@@ -986,13 +992,14 @@ private fun PlannerOverflowMenu(
     }
 }
 
+@Suppress("kotlin:S107") // Grid semantics require explicit dimensions, selection, and action callbacks.
 @Composable
 fun AccessiblePlannerGrid(
     rows: Int,
     columns: Int,
     cells: List<PlannerUiCell>,
     selectedCoordinate: CellCoordinate?,
-    onCellSelected: (CellCoordinate) -> Unit,
+    onSelectCell: (CellCoordinate) -> Unit,
     modifier: Modifier = Modifier,
     showLockMarkers: Boolean = true,
     showCompletionMarkers: Boolean = true,
@@ -1024,7 +1031,7 @@ fun AccessiblePlannerGrid(
                 )
             Surface(
                 selected = selectedCoordinate == cell.coordinate,
-                onClick = { onCellSelected(cell.coordinate) },
+                onClick = { onSelectCell(cell.coordinate) },
                 shape = RoundedCornerShape(12.dp),
                 tonalElevation = if (selectedCoordinate == cell.coordinate) 6.dp else 1.dp,
                 modifier =
@@ -1080,6 +1087,7 @@ private data class PlannerRenderPlans(
     fun forDetail(detail: MotifRenderDetail): MotifRenderPlan = if (detail == MotifRenderDetail.SMALL) small else full
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Canvas input and rendering parameters form one typed interaction contract.
 @Composable
 private fun PlannerCanvas(
     rows: Int,
@@ -1091,7 +1099,7 @@ private fun PlannerCanvas(
     showGridLines: Boolean,
     showLockMarkers: Boolean,
     showCompletionMarkers: Boolean,
-    onScaleChanged: (Float) -> Unit,
+    onScaleChange: (Float) -> Unit,
     onSelectCell: (CellCoordinate) -> Unit,
     onBeginToolDrag: (PlannerTool) -> Unit,
     onApplyToolDuringDrag: (CellCoordinate) -> Unit,
@@ -1102,6 +1110,7 @@ private fun PlannerCanvas(
     semanticDescription: String? = null,
     testTag: String = "planner_canvas",
 ) {
+    val currentOnScaleChange by rememberUpdatedState(onScaleChange)
     var viewport by remember(rows, columns) { mutableStateOf<PlannerViewport?>(null) }
     var canvasSize by remember(rows, columns) { mutableStateOf(IntSize.Zero) }
     val background = MaterialTheme.colorScheme.surfaceVariant
@@ -1184,7 +1193,7 @@ private fun PlannerCanvas(
                     )
                 }
             }
-        onScaleChanged(viewport?.scale ?: 1f)
+        currentOnScaleChange(viewport?.scale ?: 1f)
     }
 
     Box(modifier = modifier) {
@@ -1197,7 +1206,7 @@ private fun PlannerCanvas(
                         if (size != canvasSize && size.width > 0 && size.height > 0 && rows > 0 && columns > 0) {
                             canvasSize = size
                             viewport = PlannerViewport.fit(size.width.toFloat(), size.height.toFloat(), rows, columns)
-                            onScaleChanged(1f)
+                            currentOnScaleChange(1f)
                         }
                     }.semantics { contentDescription = canvasDescription }
                     .testTag(testTag)
@@ -1238,7 +1247,7 @@ private fun PlannerCanvas(
                                                     MIN_CANVAS_SCALE,
                                                     MAX_CANVAS_SCALE,
                                                 ).panBy(pan.x, pan.y)
-                                        onScaleChanged(viewport?.scale ?: 1f)
+                                        currentOnScaleChange(viewport?.scale ?: 1f)
                                     }
                                     event.changes.forEach { it.consume() }
                                 } else if (pressed.size == 1) {
@@ -1404,6 +1413,7 @@ private fun PlannerMotifPreview(
     }
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Generator controls intentionally expose each option and operation explicitly.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlannerGeneratorSheet(
@@ -1415,7 +1425,7 @@ private fun PlannerGeneratorSheet(
     onSetSeed: (String) -> Unit,
     onSetBandWidth: (Int) -> Unit,
     onSetAvoidNeighbors: (Boolean) -> Unit,
-    onSetOverwriteCompleted: (Boolean) -> Unit,
+    onSetOverwriteCompletedCells: (Boolean) -> Unit,
     onToggleDesign: (String) -> Unit,
     onAdjustWeight: (String, Double) -> Unit,
     onMoveDesign: (String, Int) -> Unit,
@@ -1545,7 +1555,7 @@ private fun PlannerGeneratorSheet(
                     label = stringResource(R.string.planner_generator_overwrite_completed),
                     checked = generator.overwriteCompleted,
                     enabled = state.trackingEnabled,
-                    onCheckedChange = onSetOverwriteCompleted,
+                    onCheckedChange = onSetOverwriteCompletedCells,
                 )
                 Text(
                     stringResource(
@@ -1680,7 +1690,7 @@ private fun PlannerGenerationPreview(
                 showGridLines = showGridLines,
                 showLockMarkers = showLockMarkers,
                 showCompletionMarkers = state.trackingEnabled,
-                onScaleChanged = {},
+                onScaleChange = {},
                 onSelectCell = {},
                 onBeginToolDrag = { _ -> },
                 onApplyToolDuringDrag = {},

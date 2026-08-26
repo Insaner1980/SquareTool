@@ -1,4 +1,5 @@
 import dev.detekt.gradle.Detekt
+import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -10,6 +11,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.stability.analyzer)
     alias(libs.plugins.owasp.dependency.check)
 }
 
@@ -29,6 +31,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -60,6 +66,7 @@ android {
 
     testOptions {
         animationsDisabled = true
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -71,6 +78,49 @@ kotlin {
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+val jacocoAnt = configurations.create("jacocoOfflineAnt")
+dependencies.add(jacocoAnt.name, "org.jacoco:org.jacoco.ant:0.8.14")
+val repositoryCoverageClasses = layout.buildDirectory.dir("jacoco/repository-classes")
+val instrumentRepositoryForCoverage =
+    tasks.register("instrumentRepositoryForCoverage") {
+        group = "verification"
+        description = "Instruments repository classes for Robolectric coverage"
+        notCompatibleWithConfigurationCache("Uses the Ant JaCoCo instrumenter at execution time")
+        dependsOn("compileDebugKotlin")
+        val compiledClasses =
+            layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+        inputs.dir(compiledClasses)
+        outputs.dir(repositoryCoverageClasses)
+        doLast {
+            delete(repositoryCoverageClasses)
+            ant.withGroovyBuilder {
+                "taskdef"(
+                    "name" to "instrument",
+                    "classname" to "org.jacoco.ant.InstrumentTask",
+                    "classpath" to jacocoAnt.asPath,
+                )
+                "instrument"("destdir" to repositoryCoverageClasses.get().asFile.path) {
+                    "fileset"("dir" to compiledClasses.get().asFile.path) {
+                        "include"(
+                            "name" to
+                                "com/finnvek/squaretool/data/repository/SquareToolRepository*.class",
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+tasks.withType<Test>().configureEach {
+    if (name == "testDebugUnitTest") {
+        notCompatibleWithConfigurationCache("Prepends offline-instrumented repository classes at execution time")
+        dependsOn(instrumentRepositoryForCoverage)
+        doFirst {
+            classpath = files(repositoryCoverageClasses, classpath)
+        }
+    }
 }
 
 ktlint {
@@ -164,6 +214,10 @@ dependencyCheck {
 }
 
 dependencies {
+    detektPlugins(libs.compose.rules.detekt)
+    ktlintRuleset(libs.compose.rules.ktlint)
+    lintChecks(libs.android.security.lints)
+
     implementation(libs.androidx.core)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -187,7 +241,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.test.core)

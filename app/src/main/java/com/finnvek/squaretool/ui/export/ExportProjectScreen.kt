@@ -60,6 +60,7 @@ import com.finnvek.squaretool.export.ProjectPdfExporter
 import com.finnvek.squaretool.export.ProjectPngExporter
 import com.finnvek.squaretool.export.ShareFileManager
 import com.finnvek.squaretool.ui.theme.SquareToolSpacing
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,6 +72,7 @@ fun ExportProjectRoute(
     container: AppContainer,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -93,7 +95,7 @@ fun ExportProjectRoute(
     val shareFiles = remember(context) { ShareFileManager(context) }
 
     LaunchedEffect(projectId) {
-        runCatching { withContext(Dispatchers.IO) { ExportSnapshotFactory.create(container.repository, projectId) } }
+        runCatching { ExportSnapshotFactory.create(container.repository, projectId) }
             .onSuccess { snapshot = it }
             .onFailure { loadFailed = true }
         loading = false
@@ -160,11 +162,8 @@ fun ExportProjectRoute(
                 scope.launch {
                     working = true
                     runCatching {
-                        val json =
-                            withContext(Dispatchers.IO) {
-                                container.backupService.createProjectJson(projectId)
-                            }
-                        withContext(Dispatchers.IO) {
+                        val json = container.backupService.createProjectJson(projectId)
+                        withContext(ioDispatcher) {
                             requireNotNull(context.contentResolver.openOutputStream(uri)).bufferedWriter().use { it.write(json) }
                         }
                     }.onSuccess { snackbar.showSnackbar(savedMessage) }
@@ -291,6 +290,7 @@ private fun ExportTopBar(onBack: () -> Unit) {
     )
 }
 
+@Suppress("kotlin:S107") // Explicit export actions keep each format and destination type-safe.
 @Composable
 fun ExportProjectScreen(
     projectName: String,

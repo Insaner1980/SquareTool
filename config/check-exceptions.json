@@ -13,7 +13,8 @@
       "tracking": "local-review:squaretool-mobsf-insights-viewmodel-key",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/ui/insights/InsightsScreen.kt",
       "selector": "key = \"insights-$projectId\"",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/insights/InsightsScreen.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/insights/InsightsScreen.kt",
+      "findingSelectors": ["key = \"insights-$projectid\""]
     },
     {
       "id": "squaretool-mobsf-library-viewmodel-keys",
@@ -27,7 +28,11 @@
       "tracking": "local-review:squaretool-mobsf-library-viewmodel-keys",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/ui/library/LibraryScreen.kt",
       "selector": "key = \"color-editor-$colorId-$duplicate\"",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/library/LibraryScreen.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/library/LibraryScreen.kt",
+      "findingSelectors": [
+        "key = \"color-editor-$colorid-$duplicate\"",
+        "key = \"palette-editor-$paletteid-$duplicate\""
+      ]
     },
     {
       "id": "squaretool-mobsf-planner-viewmodel-key",
@@ -41,7 +46,8 @@
       "tracking": "local-review:squaretool-mobsf-planner-viewmodel-key",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/ui/planner/PlannerScreen.kt",
       "selector": "key = \"planner-$projectId\"",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/planner/PlannerScreen.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/planner/PlannerScreen.kt",
+      "findingSelectors": ["key = \"planner-$projectid\""]
     },
     {
       "id": "squaretool-mobsf-planner-state-keys",
@@ -55,7 +61,12 @@
       "tracking": "local-review:squaretool-mobsf-planner-state-keys",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/ui/planner/PlannerViewModel.kt",
       "selector": "const val PROJECT_ID_KEY = \"projectId\"",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/planner/PlannerViewModel.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/planner/PlannerViewModel.kt",
+      "findingSelectors": [
+        "key = \"projectid\"",
+        "key = \"accessiblegridmode\"",
+        "key = \"generatorseed\""
+      ]
     },
     {
       "id": "squaretool-mobsf-project-editor-viewmodel-key",
@@ -69,7 +80,8 @@
       "tracking": "local-review:squaretool-mobsf-project-editor-viewmodel-key",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/ui/projects/ProjectEditorScreen.kt",
       "selector": "key = \"project-editor-$projectId\"",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/projects/ProjectEditorScreen.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/projects/ProjectEditorScreen.kt",
+      "findingSelectors": ["key = \"project-editor-$projectid\""]
     },
     {
       "id": "squaretool-mobsf-square-editor-viewmodel-key",
@@ -83,7 +95,8 @@
       "tracking": "local-review:squaretool-mobsf-square-editor-viewmodel-key",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/ui/squares/SquaresScreen.kt",
       "selector": "key = \"square-editor-$designId-$duplicate\"",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/squares/SquaresScreen.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/ui/squares/SquaresScreen.kt",
+      "findingSelectors": ["key = \"square-editor-$designid-$duplicate\""]
     },
     {
       "id": "squaretool-mobsf-deterministic-layout-random",
@@ -97,7 +110,8 @@
       "tracking": "local-review:squaretool-mobsf-deterministic-layout-random",
       "sourcePath": "app/src/main/java/com/finnvek/squaretool/domain/algorithm/LayoutGenerator.kt",
       "selector": "val random = Random(seed)",
-      "findingPath": "app/src/main/java/com/finnvek/squaretool/domain/algorithm/LayoutGenerator.kt"
+      "findingPath": "app/src/main/java/com/finnvek/squaretool/domain/algorithm/LayoutGenerator.kt",
+      "findingSelectors": ["java.util.Random"]
     },
     {
       "id": "squaretool-mobsf-target-sdk",
@@ -111,7 +125,10 @@
       "tracking": "local-review:squaretool-mobsf-target-sdk",
       "sourcePath": "app/build.gradle.kts",
       "selector": "targetSdk = 37",
-      "findingPath": "app/src/main/AndroidManifest.xml"
+      "findingPath": "app/src/main/AndroidManifest.xml",
+      "findingSelectors": [
+        "Activity exported, targetSdk<29 and launchMode != singleInstance or taskAffinity is not empty"
+      ]
     }
   ]
 }

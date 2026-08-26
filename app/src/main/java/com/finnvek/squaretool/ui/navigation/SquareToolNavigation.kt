@@ -25,17 +25,7 @@ fun SquareToolNavigationBar(
                 modifier = Modifier.testTag("top_level_destination"),
                 selected = selected == destination,
                 onClick = { onSelect(destination) },
-                icon = {
-                    Icon(
-                        imageVector =
-                            if (selected == destination) {
-                                destination.selectedIcon
-                            } else {
-                                destination.unselectedIcon
-                            },
-                        contentDescription = null,
-                    )
-                },
+                icon = { DestinationIcon(destination, selected == destination) },
                 label = { Text(label) },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(),
@@ -57,19 +47,20 @@ fun SquareToolNavigationRail(
                 modifier = Modifier.testTag("top_level_destination"),
                 selected = selected == destination,
                 onClick = { onSelect(destination) },
-                icon = {
-                    Icon(
-                        imageVector =
-                            if (selected == destination) {
-                                destination.selectedIcon
-                            } else {
-                                destination.unselectedIcon
-                            },
-                        contentDescription = null,
-                    )
-                },
+                icon = { DestinationIcon(destination, selected == destination) },
                 label = { Text(label) },
             )
         }
     }
+}
+
+@Composable
+private fun DestinationIcon(
+    destination: TopLevelDestination,
+    selected: Boolean,
+) {
+    Icon(
+        imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+        contentDescription = null,
+    )
 }

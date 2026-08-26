@@ -38,7 +38,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
@@ -52,7 +51,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
@@ -77,6 +75,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,6 +103,9 @@ import com.finnvek.squaretool.render.MotifTemplate
 import com.finnvek.squaretool.render.MotifTemplateRegistry
 import com.finnvek.squaretool.render.SquareDesignVisual
 import com.finnvek.squaretool.render.drawMotif
+import com.finnvek.squaretool.ui.SquareToolEditorActions
+import com.finnvek.squaretool.ui.SquareToolMenuItem
+import com.finnvek.squaretool.ui.SquareToolSearchClearButton
 import com.finnvek.squaretool.ui.theme.SquareToolSpacing
 import androidx.compose.foundation.lazy.grid.items as gridItems
 
@@ -111,27 +113,28 @@ import androidx.compose.foundation.lazy.grid.items as gridItems
 fun SquaresRoute(
     repository: SquareToolRepository,
     modifier: Modifier = Modifier,
+    squaresViewModel: SquaresViewModel = viewModel(factory = SquaresViewModel.factory(repository)),
     onCreateDesign: () -> Unit = {},
     onEditDesign: (id: String, duplicate: Boolean) -> Unit = { _, _ -> },
     onUseInProject: (id: String) -> Unit = {},
 ) {
-    val viewModel: SquaresViewModel = viewModel(factory = SquaresViewModel.factory(repository))
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by squaresViewModel.uiState.collectAsStateWithLifecycle()
     SquaresScreen(
         state = state,
-        onQueryChange = viewModel::onQueryChange,
-        onFilterChange = viewModel::onFilterChange,
-        onSelectDesign = viewModel::selectDesign,
-        onFavorite = viewModel::toggleFavorite,
+        onQueryChange = squaresViewModel::onQueryChange,
+        onFilterChange = squaresViewModel::onFilterChange,
+        onSelectDesign = squaresViewModel::selectDesign,
+        onFavorite = squaresViewModel::toggleFavorite,
         onCreateDesign = onCreateDesign,
         onEditDesign = onEditDesign,
         onUseInProject = onUseInProject,
-        onDeleteDesign = viewModel::deleteDesign,
-        onNoticeShown = viewModel::clearNotice,
+        onDeleteDesign = squaresViewModel::deleteDesign,
+        onShowNotice = squaresViewModel::clearNotice,
         modifier = modifier,
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Square list state and actions stay explicit across declarative branches.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SquaresScreen(
@@ -144,10 +147,11 @@ fun SquaresScreen(
     onEditDesign: (String, Boolean) -> Unit,
     onUseInProject: (String) -> Unit,
     onDeleteDesign: (String) -> Unit,
-    onNoticeShown: () -> Unit,
+    onShowNotice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val currentOnShowNotice by rememberUpdatedState(onShowNotice)
     val noticeMessage =
         state.notice?.let { notice ->
             when (notice) {
@@ -171,7 +175,7 @@ fun SquaresScreen(
     LaunchedEffect(noticeMessage) {
         if (noticeMessage != null) {
             snackbarHostState.showSnackbar(noticeMessage)
-            onNoticeShown()
+            currentOnShowNotice()
         }
     }
 
@@ -217,9 +221,7 @@ fun SquaresScreen(
                     trailingIcon =
                         if (state.query.isNotEmpty()) {
                             {
-                                IconButton(onClick = { onQueryChange("") }) {
-                                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.squares_clear_search))
-                                }
+                                SquareToolSearchClearButton(R.string.squares_clear_search, onClick = { onQueryChange("") })
                             }
                         } else {
                             null
@@ -325,6 +327,7 @@ private fun SquareEmptyState(
     }
 }
 
+@Suppress("kotlin:S3776") // Card branches directly mirror design state and available actions.
 @Composable
 private fun SquareDesignCard(
     item: SquareDesignListItem,
@@ -375,49 +378,37 @@ private fun SquareDesignCard(
                 }
                 DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                     if (item.canEdit) {
-                        MenuAction(R.string.squares_edit, Icons.Default.Edit) {
+                        SquareToolMenuItem(R.string.squares_edit, Icons.Default.Edit, onClick = {
                             menuExpanded = false
                             onEdit()
-                        }
+                        })
                     }
-                    MenuAction(R.string.squares_duplicate, Icons.Default.SwapHoriz) {
+                    SquareToolMenuItem(R.string.squares_duplicate, Icons.Default.SwapHoriz, onClick = {
                         menuExpanded = false
                         onDuplicate()
-                    }
-                    MenuAction(R.string.squares_use_in_project, Icons.Default.Add) {
+                    })
+                    SquareToolMenuItem(R.string.squares_use_in_project, Icons.Default.Add, onClick = {
                         menuExpanded = false
                         onUseInProject()
-                    }
-                    MenuAction(
+                    })
+                    SquareToolMenuItem(
                         if (item.design.favorite) R.string.squares_unfavorite else R.string.squares_favorite,
                         if (item.design.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    ) {
-                        menuExpanded = false
-                        onFavorite()
-                    }
+                        onClick = {
+                            menuExpanded = false
+                            onFavorite()
+                        },
+                    )
                     if (item.canEdit) {
-                        MenuAction(R.string.squares_delete, Icons.Default.Delete) {
+                        SquareToolMenuItem(R.string.squares_delete, Icons.Default.Delete, onClick = {
                             menuExpanded = false
                             onDelete()
-                        }
+                        })
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-private fun MenuAction(
-    @StringRes label: Int,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit,
-) {
-    DropdownMenuItem(
-        text = { Text(stringResource(label)) },
-        onClick = onClick,
-        leadingIcon = { Icon(icon, contentDescription = null) },
-    )
 }
 
 @Composable
@@ -428,6 +419,9 @@ private fun SquareDetails(
     onDuplicate: () -> Unit,
     onUseInProject: () -> Unit,
 ) {
+    val favoriteIcon = if (item.design.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+    val favoriteContentDescription =
+        stringResource(if (item.design.favorite) R.string.squares_unfavorite else R.string.squares_favorite)
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = SquareToolSpacing.Standard, vertical = SquareToolSpacing.Small),
         verticalArrangement = Arrangement.spacedBy(SquareToolSpacing.Medium),
@@ -445,11 +439,8 @@ private fun SquareDetails(
             }
             IconButton(onClick = onFavorite) {
                 Icon(
-                    if (item.design.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription =
-                        stringResource(
-                            if (item.design.favorite) R.string.squares_unfavorite else R.string.squares_favorite,
-                        ),
+                    favoriteIcon,
+                    contentDescription = favoriteContentDescription,
                 )
             }
         }
@@ -525,13 +516,13 @@ fun SquareEditorRoute(
     modifier: Modifier = Modifier,
     designId: String? = null,
     duplicate: Boolean = false,
-    onClose: () -> Unit = {},
-) {
-    val editorViewModel: SquareEditorViewModel =
+    editorViewModel: SquareEditorViewModel =
         viewModel(
             key = "square-editor-$designId-$duplicate",
             factory = SquareEditorViewModel.factory(repository, designId, duplicate),
-        )
+        ),
+    onClose: () -> Unit = {},
+) {
     val state by editorViewModel.uiState.collectAsStateWithLifecycle()
     SquareEditorScreen(
         state = state,
@@ -540,7 +531,7 @@ fun SquareEditorRoute(
         onNameChange = editorViewModel::updateName,
         onNotesChange = editorViewModel::updateNotes,
         onFavoriteChange = editorViewModel::updateFavorite,
-        onTemplateSelected = editorViewModel::selectTemplate,
+        onSelectTemplate = editorViewModel::selectTemplate,
         onAssignColor = editorViewModel::assignColor,
         onAddRound = editorViewModel::addRound,
         onRemoveRound = editorViewModel::removeRound,
@@ -554,6 +545,7 @@ fun SquareEditorRoute(
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Explicit round and draft actions form the editor's typed contract.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SquareEditorScreen(
@@ -563,7 +555,7 @@ fun SquareEditorScreen(
     onNameChange: (String) -> Unit,
     onNotesChange: (String) -> Unit,
     onFavoriteChange: (Boolean) -> Unit,
-    onTemplateSelected: (String) -> Unit,
+    onSelectTemplate: (String) -> Unit,
     onAssignColor: (Int, String) -> Unit,
     onAddRound: () -> Unit,
     onRemoveRound: (Int) -> Unit,
@@ -662,7 +654,7 @@ fun SquareEditorScreen(
                             template = template,
                             selected = template.id == state.draft.templateId,
                             colors = state.draft.roundColorIds.mapNotNull(colorMap::get),
-                            onClick = { onTemplateSelected(template.id) },
+                            onClick = { onSelectTemplate(template.id) },
                         )
                     }
                 }
@@ -733,14 +725,13 @@ fun SquareEditorScreen(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(SquareToolSpacing.Medium)) {
-                    OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f).heightIn(min = 56.dp)) {
-                        Text(stringResource(R.string.square_editor_cancel))
-                    }
-                    Button(onClick = onSave, modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("save_square")) {
-                        Text(stringResource(R.string.square_editor_save))
-                    }
-                }
+                SquareToolEditorActions(
+                    cancelLabel = R.string.square_editor_cancel,
+                    saveLabel = R.string.square_editor_save,
+                    saveTestTag = "save_square",
+                    onCancel = onCancel,
+                    onSave = onSave,
+                )
                 Spacer(Modifier.height(SquareToolSpacing.Section))
             }
         }
@@ -862,6 +853,7 @@ private fun TemplateCard(
     }
 }
 
+@Suppress("kotlin:S107") // Round controls remain explicit for accessibility and reorder semantics.
 @Composable
 private fun RoundEditorRow(
     index: Int,

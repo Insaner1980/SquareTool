@@ -105,6 +105,7 @@ class InsightsScreenTest {
         composeRule.onNodeWithText("Moss Green").performScrollTo().assertIsDisplayed()
     }
 
+    // CPD-OFF
     private fun project() =
         ProjectEntity(
             id = "p",
@@ -128,4 +129,5 @@ class InsightsScreenTest {
             joiningAndEdgingBufferPercent = 10.0,
             demoProject = false,
         )
+    // CPD-ON
 }

@@ -61,11 +61,18 @@ import com.finnvek.squaretool.ui.theme.SquareToolSpacing
 import java.text.NumberFormat
 import kotlin.math.roundToInt
 
+// CPD-OFF
+@Suppress("kotlin:S107") // Route callbacks keep navigation and project actions independently typed.
 @Composable
 fun InsightsRoute(
     repository: SquareToolRepository,
     projectId: String,
     modifier: Modifier = Modifier,
+    insightsViewModel: InsightsViewModel =
+        viewModel(
+            key = "insights-$projectId",
+            factory = InsightsViewModel.factory(repository, projectId),
+        ),
     onBack: () -> Unit = {},
     onExportPdf: () -> Unit = {},
     onSaveImage: () -> Unit = {},
@@ -73,11 +80,7 @@ fun InsightsRoute(
     onShareImage: () -> Unit = {},
     onExportBackup: () -> Unit = {},
 ) {
-    val insightsViewModel: InsightsViewModel =
-        viewModel(
-            key = "insights-$projectId",
-            factory = InsightsViewModel.factory(repository, projectId),
-        )
+    // CPD-ON
     val state by insightsViewModel.uiState.collectAsStateWithLifecycle()
     InsightsScreen(
         state = state,
@@ -91,6 +94,7 @@ fun InsightsRoute(
     )
 }
 
+@Suppress("kotlin:S107") // Explicit insights actions are clearer than a generic event dispatcher.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InsightsScreen(

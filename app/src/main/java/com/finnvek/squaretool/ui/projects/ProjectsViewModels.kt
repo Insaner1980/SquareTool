@@ -10,6 +10,7 @@ import com.finnvek.squaretool.data.local.SquareDesignWithRounds
 import com.finnvek.squaretool.data.repository.AppSettings
 import com.finnvek.squaretool.data.repository.SquareToolRepository
 import com.finnvek.squaretool.domain.model.MeasurementUnit
+import com.finnvek.squaretool.ui.simpleViewModelFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
 
 sealed interface ProjectConfirmation {
     val project: ProjectEntity
@@ -191,7 +193,7 @@ class ProjectsViewModel(
 
     companion object {
         fun factory(repository: SquareToolRepository): ViewModelProvider.Factory =
-            viewModelFactory {
+            simpleViewModelFactory {
                 ProjectsViewModel(repository)
             }
     }
@@ -231,8 +233,8 @@ class ProjectEditorViewModel(
     private val settings: AppSettings,
 ) : ViewModel() {
     private val state = MutableStateFlow(ProjectEditorUiState())
-    private var originalProject: ProjectEntity? = null
-    private var originalCells: List<ProjectCellEntity> = emptyList()
+    private val originalProject = AtomicReference<ProjectEntity?>(null)
+    private val originalCells = AtomicReference<List<ProjectCellEntity>>(emptyList())
 
     val uiState = state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), state.value)
 
@@ -248,8 +250,8 @@ class ProjectEditorViewModel(
                         project?.let { repository.getProjectPalette(it.id).map(ColorEntity::id).toSet() }
                             ?: colors.take(7).map(ColorEntity::id).toSet()
                     val palette = project?.let { repository.getProjectPalette(it.id) }.orEmpty()
-                    originalProject = project
-                    originalCells = cells
+                    originalProject.set(project)
+                    originalCells.set(cells)
                     val draft =
                         initialProjectEditorDraft(
                             project = project,
@@ -345,11 +347,11 @@ class ProjectEditorViewModel(
             state.update { it.copy(validationErrors = errors, notice = ProjectEditorNotice.INVALID_DRAFT) }
             return
         }
-        val original = originalProject
+        val original = originalProject.get()
         if (original != null && !shrinkConfirmed &&
             (draft.rows < original.rowCount || draft.columns < original.columnCount)
         ) {
-            val impact = calculateShrinkImpact(originalCells, draft.rows, draft.columns)
+            val impact = calculateShrinkImpact(originalCells.get(), draft.rows, draft.columns)
             if (impact.lostCellCount > 0) {
                 state.update { it.copy(pendingShrink = impact) }
                 return
@@ -369,7 +371,7 @@ class ProjectEditorViewModel(
 
     private suspend fun persist(draft: ProjectEditorDraft): ProjectEntity {
         val now = System.currentTimeMillis()
-        val original = originalProject
+        val original = originalProject.get()
         val project =
             ProjectEntity(
                 id = draft.id,
@@ -410,19 +412,10 @@ class ProjectEditorViewModel(
             projectId: String?,
             settings: AppSettings,
         ): ViewModelProvider.Factory =
-            viewModelFactory {
+            simpleViewModelFactory {
                 ProjectEditorViewModel(repository, projectId, settings)
             }
     }
 }
 
 private fun Set<String>.toggle(value: String): Set<String> = if (value in this) this - value else this + value
-
-private inline fun <reified T : ViewModel> viewModelFactory(crossinline create: () -> T): ViewModelProvider.Factory =
-    object : ViewModelProvider.Factory {
-        override fun <VM : ViewModel> create(modelClass: Class<VM>): VM {
-            require(modelClass.isAssignableFrom(T::class.java))
-            @Suppress("UNCHECKED_CAST")
-            return create() as VM
-        }
-    }

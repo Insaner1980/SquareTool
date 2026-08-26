@@ -71,24 +71,26 @@ import com.finnvek.squaretool.data.repository.SquareToolRepository
 import com.finnvek.squaretool.render.MotifRenderConfig
 import com.finnvek.squaretool.render.SquareDesignVisual
 import com.finnvek.squaretool.render.drawMotif
+import com.finnvek.squaretool.ui.SquareToolLoadingIndicator
 import com.finnvek.squaretool.ui.projects.ProjectBlanketPreview
 import com.finnvek.squaretool.ui.projects.ProjectCardModel
 import com.finnvek.squaretool.ui.theme.LocalReduceMotion
 import com.finnvek.squaretool.ui.theme.SquareToolMotion
 import com.finnvek.squaretool.ui.theme.SquareToolSpacing
 
+@Suppress("kotlin:S107") // Route callbacks expose the home destinations without an untyped action bag.
 @Composable
 fun HomeRoute(
     repository: SquareToolRepository,
     modifier: Modifier = Modifier,
+    homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.factory(repository)),
     onOpenPlanner: (String) -> Unit = {},
     onOpenInsights: (String) -> Unit = {},
     onEditProject: (String) -> Unit = {},
     onViewAllProjects: () -> Unit = {},
     onNewProject: () -> Unit = {},
-    onSampleCreated: (String) -> Unit = {},
+    onSampleCreate: (String) -> Unit = {},
 ) {
-    val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.factory(repository))
     val state by homeViewModel.uiState.collectAsStateWithLifecycle()
     HomeScreen(
         state = state,
@@ -103,11 +105,12 @@ fun HomeRoute(
         onCancelDelete = homeViewModel::cancelDelete,
         onViewAllProjects = onViewAllProjects,
         onNewProject = onNewProject,
-        onCreateSample = { homeViewModel.createSample(onSampleCreated) },
+        onCreateSample = { homeViewModel.createSample(onSampleCreate) },
         modifier = modifier,
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // The screen renders independent home states and explicit user actions.
 @Composable
 fun HomeScreen(
     state: HomeUiState,
@@ -140,13 +143,12 @@ fun HomeScreen(
             )
         },
     ) { padding ->
+        val contentModifier = Modifier.fillMaxSize().padding(padding)
         if (state.isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            SquareToolLoadingIndicator(contentModifier)
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = contentModifier,
                 contentPadding =
                     androidx.compose.foundation.layout.PaddingValues(
                         horizontal = SquareToolSpacing.Standard,
@@ -339,6 +341,7 @@ private fun HomeEmptyState(
     }
 }
 
+@Suppress("kotlin:S3776") // Card branches directly mirror the project's progress and menu state.
 @Composable
 private fun CurrentProjectCard(
     model: ProjectCardModel,

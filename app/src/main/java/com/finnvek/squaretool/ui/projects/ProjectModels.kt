@@ -8,13 +8,11 @@ import com.finnvek.squaretool.data.local.SquareRoundEntity
 import com.finnvek.squaretool.data.repository.AppSettings
 import com.finnvek.squaretool.data.repository.MeasurementUnitPreference
 import com.finnvek.squaretool.data.repository.ProjectCardData
+import com.finnvek.squaretool.data.repository.toGridSnapshot
 import com.finnvek.squaretool.domain.algorithm.ProgressCalculator
 import com.finnvek.squaretool.domain.algorithm.YarnCalculator
-import com.finnvek.squaretool.domain.model.CellCoordinate
-import com.finnvek.squaretool.domain.model.CellState
 import com.finnvek.squaretool.domain.model.DesignColorProfile
 import com.finnvek.squaretool.domain.model.GridSize
-import com.finnvek.squaretool.domain.model.GridSnapshot
 import com.finnvek.squaretool.domain.model.MeasurementUnit
 import com.finnvek.squaretool.domain.model.ProjectProgress
 import com.finnvek.squaretool.domain.model.YarnEstimate
@@ -65,7 +63,7 @@ fun buildProjectCardModel(
                             .mapNotNull { colorsById[it.colorId]?.argb?.toInt() },
                 )
         }
-    val snapshot = project.toSnapshot(boundedCells)
+    val snapshot = project.toGridSnapshot(boundedCells)
     val profiles =
         designs
             .mapNotNull { relation ->
@@ -242,6 +240,7 @@ fun initialProjectEditorDraft(
 
 private val INCH_BASED_COUNTRIES = setOf("US", "LR", "MM")
 
+@Suppress("kotlin:S3776") // Validation intentionally evaluates the complete draft in one deterministic pass.
 fun ProjectEditorDraft.validationErrors(): Set<ProjectDraftError> =
     buildSet {
         if (name.isBlank()) add(ProjectDraftError.NAME)
@@ -283,21 +282,6 @@ fun calculateShrinkImpact(
         lostAssignedCellCount = lost.count { it.squareDesignId != null },
     )
 }
-
-internal fun ProjectEntity.toSnapshot(cells: List<ProjectCellEntity>): GridSnapshot =
-    GridSnapshot.of(
-        size = GridSize(rowCount, columnCount),
-        cells =
-            cells.map {
-                CellState(
-                    coordinate = CellCoordinate(it.rowIndex, it.columnIndex),
-                    designId = it.squareDesignId,
-                    locked = it.locked,
-                    completed = it.completed,
-                    gramsPerSquareOverride = it.gramsPerSquareOverride,
-                )
-            },
-    )
 
 private fun String.isBlankOrPositive(): Boolean {
     if (isBlank()) return true

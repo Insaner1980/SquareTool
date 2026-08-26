@@ -1,0 +1,4 @@
+$ProjectCheckCommand = "google-android-security"
+$ProjectRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+& "C:\Dev\Android-check\tools\InvokeProjectCheck.ps1" -ProjectCheckCommand $ProjectCheckCommand -Root $ProjectRoot -ProjectId "squaretool" @args
+exit $LASTEXITCODE

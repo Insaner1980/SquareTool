@@ -138,6 +138,7 @@ class ProjectCardFlowTest {
             value
         }
 
+    // CPD-OFF
     private fun project() =
         ProjectEntity(
             id = "project",
@@ -161,6 +162,7 @@ class ProjectCardFlowTest {
             joiningAndEdgingBufferPercent = 10.0,
             demoProject = false,
         )
+    // CPD-ON
 
     private fun design(name: String) =
         SquareDesignEntity(

@@ -27,8 +27,12 @@ import com.finnvek.squaretool.ui.theme.LocalReduceMotion
 import com.finnvek.squaretool.ui.theme.SquareToolTheme
 import kotlinx.coroutines.launch
 
+@Suppress("kotlin:S3776") // App startup branches are mutually exclusive declarative states.
 @Composable
-fun SquareToolApp(container: AppContainer) {
+fun SquareToolApp(
+    container: AppContainer,
+    modifier: Modifier = Modifier,
+) {
     val settings: AppSettings? by container.settingsRepository.settings.collectAsStateWithLifecycle(
         initialValue = null,
     )
@@ -49,7 +53,7 @@ fun SquareToolApp(container: AppContainer) {
         CompositionLocalProvider(
             LocalReduceMotion provides (settings?.reduceMotion == true),
         ) {
-            Surface(modifier = Modifier.fillMaxSize()) {
+            Surface(modifier = modifier.fillMaxSize()) {
                 when {
                     settings == null -> {
                         Box(Modifier.fillMaxSize())
@@ -104,7 +108,7 @@ fun SquareToolApp(container: AppContainer) {
                             settings = settings!!,
                             initialActiveProjectId = initialActiveProjectId,
                             postOnboardingRoute = postOnboardingRoute,
-                            onPostOnboardingRouteConsumed = { postOnboardingRoute = null },
+                            onConsumePostOnboardingRoute = { postOnboardingRoute = null },
                         )
                     }
                 }

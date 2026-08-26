@@ -76,7 +76,7 @@ class SquaresAndLibraryScreenTest {
                     onEditDesign = { _, _ -> },
                     onUseInProject = {},
                     onDeleteDesign = {},
-                    onNoticeShown = {},
+                    onShowNotice = {},
                 )
             }
         }
@@ -113,7 +113,7 @@ class SquaresAndLibraryScreenTest {
                     onNameChange = {},
                     onNotesChange = {},
                     onFavoriteChange = {},
-                    onTemplateSelected = {},
+                    onSelectTemplate = {},
                     onAssignColor = { _, _ -> },
                     onAddRound = {},
                     onRemoveRound = {},
@@ -150,7 +150,7 @@ class SquaresAndLibraryScreenTest {
                             isLoading = false,
                         ),
                     projectId = null,
-                    onTabSelected = { selectedTab = it },
+                    onSelectTab = { selectedTab = it },
                     onQueryChange = {},
                     onCreateColor = {},
                     onEditColor = { _, _ -> },
@@ -160,7 +160,7 @@ class SquaresAndLibraryScreenTest {
                     onDeletePalette = {},
                     onApplyPalette = { _, _ -> },
                     onSaveProjectPalette = { _, _ -> },
-                    onNoticeShown = {},
+                    onShowNotice = {},
                 )
             }
         }

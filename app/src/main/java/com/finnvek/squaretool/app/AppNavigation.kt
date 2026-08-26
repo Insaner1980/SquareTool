@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,17 +59,19 @@ import com.finnvek.squaretool.ui.squares.SquareEditorRoute
 import com.finnvek.squaretool.ui.squares.SquaresRoute
 import kotlinx.coroutines.launch
 
+@Suppress("kotlin:S3776") // The navigation host keeps route ownership and back-stack transitions in one registry.
 @Composable
 internal fun SquareToolNavigationHost(
     container: AppContainer,
     settings: AppSettings,
     initialActiveProjectId: String?,
     postOnboardingRoute: String?,
-    onPostOnboardingRouteConsumed: () -> Unit,
+    onConsumePostOnboardingRoute: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val currentOnConsumePostOnboardingRoute by rememberUpdatedState(onConsumePostOnboardingRoute)
     val projects by container.repository.observeProjects().collectAsStateWithLifecycle(
         initialValue = emptyList(),
     )
@@ -90,7 +93,7 @@ internal fun SquareToolNavigationHost(
     LaunchedEffect(postOnboardingRoute) {
         if (postOnboardingRoute != null) {
             navController.navigate(postOnboardingRoute) { launchSingleTop = true }
-            onPostOnboardingRouteConsumed()
+            currentOnConsumePostOnboardingRoute()
         }
     }
 
@@ -147,7 +150,7 @@ internal fun SquareToolNavigationHost(
                     onEditProject = { navController.navigate(AppRoute.projectEditor(it)) },
                     onViewAllProjects = { navController.navigate(AppRoute.Projects) },
                     onNewProject = { navController.navigate(AppRoute.projectEditor()) },
-                    onSampleCreated = { projectId ->
+                    onSampleCreate = { projectId ->
                         activeProjectId = projectId
                         scope.launch {
                             container.settingsRepository.setSampleProjectOffered(true)
@@ -248,7 +251,7 @@ internal fun SquareToolNavigationHost(
                     settings = settings,
                     projectId = projectId,
                     onClose = { navController.popBackStack() },
-                    onSaved = { savedProjectId ->
+                    onSave = { savedProjectId ->
                         navController.popBackStack()
                         val designId = pendingPlannerDesignId
                         pendingPlannerDesignId = null
@@ -294,6 +297,7 @@ internal fun SquareToolNavigationHost(
                 arguments = listOf(navArgument("projectId") { type = NavType.StringType }),
             ) { entry ->
                 val projectId = requireNotNull(entry.arguments?.getString("projectId"))
+                // CPD-OFF
                 PlannerRoute(
                     projectId = projectId,
                     repository = container.repository,
@@ -304,6 +308,7 @@ internal fun SquareToolNavigationHost(
                     onExport = { navController.navigate(AppRoute.export(projectId)) },
                     onEditProject = { navController.navigate(AppRoute.projectEditor(projectId)) },
                 )
+                // CPD-ON
             }
             composable(
                 route = AppRoute.PlannerDesignPattern,

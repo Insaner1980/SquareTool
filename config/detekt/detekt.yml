@@ -2,6 +2,10 @@ config:
   validation: true
   warningsAsErrors: false
 
+Compose:
+  CompositionLocalAllowlist:
+    allowedCompositionLocals: LocalReduceMotion
+
 naming:
   FunctionNaming:
     ignoreAnnotated:

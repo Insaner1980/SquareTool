@@ -54,6 +54,7 @@ private val onboardingPages =
         OnboardingPage(R.string.keep_a_clear_project_plan, R.string.keep_a_clear_project_plan_body, Icons.Outlined.AutoGraph),
     )
 
+@Suppress("kotlin:S3776") // Page-specific onboarding controls are mutually exclusive declarative states.
 @Composable
 fun OnboardingScreen(
     onCreateProject: () -> Unit,

@@ -8,7 +8,8 @@ import com.finnvek.squaretool.data.local.PaletteColorCrossRef
 import com.finnvek.squaretool.data.local.PaletteEntity
 import com.finnvek.squaretool.data.repository.ColorUsage
 import com.finnvek.squaretool.data.repository.SquareToolRepository
-import com.finnvek.squaretool.ui.squares.simpleViewModelFactory
+import com.finnvek.squaretool.ui.moveListItem
+import com.finnvek.squaretool.ui.simpleViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
 
 data class PaletteListItem(
     val palette: PaletteEntity,
@@ -172,13 +174,13 @@ class ColorEditorViewModel(
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(ColorEditorUiState())
     val uiState = mutableState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), mutableState.value)
-    private var originalCreatedAt: Long? = null
+    private val originalCreatedAt = AtomicReference<Long?>(null)
 
     init {
         viewModelScope.launch {
             val source = colorId?.let { repository.getColor(it) }
             val shouldDuplicate = duplicate || source?.builtIn == true
-            if (source != null && !shouldDuplicate) originalCreatedAt = source.createdAt
+            if (source != null && !shouldDuplicate) originalCreatedAt.set(source.createdAt)
             mutableState.value =
                 ColorEditorUiState(
                     draft =
@@ -245,7 +247,7 @@ class ColorEditorViewModel(
                     yarnLengthUnit = draft.yarnLengthUnit,
                     notes = draft.notes.trim(),
                     builtIn = false,
-                    createdAt = originalCreatedAt ?: now,
+                    createdAt = originalCreatedAt.get() ?: now,
                     updatedAt = now,
                 )
             runCatching { repository.saveColor(entity) }
@@ -287,14 +289,14 @@ class PaletteEditorViewModel(
     val uiState =
         combine(mutableState, repository.observeColors()) { state, colors -> state.copy(availableColors = colors) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), mutableState.value)
-    private var originalCreatedAt: Long? = null
+    private val originalCreatedAt = AtomicReference<Long?>(null)
 
     init {
         viewModelScope.launch {
             val source = paletteId?.let { repository.getPalette(it) }
             val colors = source?.let { repository.getPaletteColors(it.id) }.orEmpty()
             val shouldDuplicate = duplicate || source?.builtIn == true
-            if (source != null && !shouldDuplicate) originalCreatedAt = source.createdAt
+            if (source != null && !shouldDuplicate) originalCreatedAt.set(source.createdAt)
             mutableState.value =
                 PaletteEditorUiState(
                     draft =
@@ -327,7 +329,7 @@ class PaletteEditorViewModel(
         fromIndex: Int,
         toIndex: Int,
     ) = updateDraft {
-        copy(colorIds = movePaletteColor(colorIds, fromIndex, toIndex))
+        copy(colorIds = moveListItem(colorIds, fromIndex, toIndex))
     }
 
     fun save(onSaved: () -> Unit) {
@@ -338,7 +340,7 @@ class PaletteEditorViewModel(
         }
         viewModelScope.launch {
             val now = System.currentTimeMillis()
-            val entity = PaletteEntity(draft.id, draft.name.trim(), false, originalCreatedAt ?: now, now)
+            val entity = PaletteEntity(draft.id, draft.name.trim(), false, originalCreatedAt.get() ?: now, now)
             runCatching {
                 repository.savePalette(
                     entity,

@@ -80,6 +80,7 @@ class ProjectEditorPersistenceTest {
         }
     }
 
+    // CPD-OFF
     private fun project(
         id: String,
         rows: Int,
@@ -132,4 +133,5 @@ class ProjectEditorPersistenceTest {
         )
 
     private fun rounds() = List(3) { index -> SquareRoundEntity("design", index, "cream") }
+    // CPD-ON
 }

@@ -44,6 +44,7 @@ class HomeModelsTest {
         notes: String = "",
     ) = ProjectCardModel(project(id, name, openedAt, favorite, notes))
 
+    // CPD-OFF
     private fun project(
         id: String,
         name: String,
@@ -72,4 +73,5 @@ class HomeModelsTest {
         joiningAndEdgingBufferPercent = 10.0,
         demoProject = false,
     )
+    // CPD-ON
 }

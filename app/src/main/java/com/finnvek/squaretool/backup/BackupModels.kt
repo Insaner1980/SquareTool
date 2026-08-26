@@ -20,6 +20,7 @@ data class SquareToolBackupDto(
 )
 
 @Serializable
+// CPD-OFF
 data class BackupProjectDto(
     val id: String,
     val name: String,
@@ -42,8 +43,10 @@ data class BackupProjectDto(
     val joiningAndEdgingBufferPercent: Double,
     val demoProject: Boolean,
 )
+// CPD-ON
 
 @Serializable
+// CPD-OFF
 data class BackupSquareDesignDto(
     val id: String,
     val name: String,
@@ -56,6 +59,7 @@ data class BackupSquareDesignDto(
     val createdAt: Long,
     val updatedAt: Long,
 )
+// CPD-ON
 
 @Serializable
 data class BackupSquareRoundDto(

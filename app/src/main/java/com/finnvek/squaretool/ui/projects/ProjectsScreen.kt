@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,21 +61,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.finnvek.squaretool.R
 import com.finnvek.squaretool.data.local.ProjectEntity
 import com.finnvek.squaretool.data.repository.SquareToolRepository
+import com.finnvek.squaretool.ui.SquareToolLoadingIndicator
 import com.finnvek.squaretool.ui.theme.SquareToolSpacing
 import java.text.DateFormat
 import java.util.Date
 
+@Suppress("kotlin:S107") // Route callbacks keep project destinations and actions independently typed.
 @Composable
 fun ProjectsRoute(
     repository: SquareToolRepository,
     modifier: Modifier = Modifier,
+    projectsViewModel: ProjectsViewModel = viewModel(factory = ProjectsViewModel.factory(repository)),
     onBack: (() -> Unit)? = null,
     onOpenProject: (String) -> Unit = {},
     onOpenInsights: (String) -> Unit = {},
     onEditProject: (String) -> Unit = {},
     onNewProject: () -> Unit = {},
 ) {
-    val projectsViewModel: ProjectsViewModel = viewModel(factory = ProjectsViewModel.factory(repository))
     val state by projectsViewModel.uiState.collectAsStateWithLifecycle()
     ProjectsScreen(
         state = state,
@@ -100,6 +101,7 @@ fun ProjectsRoute(
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Project list states and actions are explicit declarative branches.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
@@ -143,9 +145,7 @@ fun ProjectsScreen(
         },
     ) { padding ->
         if (state.isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            SquareToolLoadingIndicator(Modifier.padding(padding))
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
@@ -322,6 +322,7 @@ fun ProjectsScreen(
     }
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Card actions remain explicit for accessibility and test semantics.
 @Composable
 private fun ProjectManagementCard(
     model: ProjectCardModel,

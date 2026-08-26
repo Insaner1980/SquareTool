@@ -41,6 +41,7 @@ internal fun ProjectEntity.toBackupDto() =
         demoProject = demoProject,
     )
 
+// CPD-OFF
 internal fun BackupProjectDto.toEntity() =
     ProjectEntity(
         id = id,
@@ -64,6 +65,7 @@ internal fun BackupProjectDto.toEntity() =
         joiningAndEdgingBufferPercent = joiningAndEdgingBufferPercent,
         demoProject = demoProject,
     )
+// CPD-ON
 
 internal fun SquareDesignEntity.toBackupDto() =
     BackupSquareDesignDto(

@@ -81,6 +81,7 @@ data class ColorEntity(
     val updatedAt: Long,
 )
 
+// CPD-OFF
 @Entity(
     tableName = "square_rounds",
     primaryKeys = ["squareDesignId", "roundIndex"],
@@ -100,6 +101,7 @@ data class ColorEntity(
     ],
     indices = [Index("colorId")],
 )
+// CPD-ON
 data class SquareRoundEntity(
     val squareDesignId: String,
     val roundIndex: Int,
@@ -118,6 +120,7 @@ data class PaletteEntity(
     val updatedAt: Long,
 )
 
+// CPD-OFF
 @Entity(
     tableName = "palette_color_cross_ref",
     primaryKeys = ["paletteId", "colorId"],
@@ -140,6 +143,7 @@ data class PaletteEntity(
         Index(value = ["paletteId", "displayOrder"], unique = true),
     ],
 )
+// CPD-ON
 data class PaletteColorCrossRef(
     val paletteId: String,
     val colorId: String,

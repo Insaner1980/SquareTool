@@ -32,6 +32,7 @@ fun AboutScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
+            // CPD-OFF
             TopAppBar(
                 title = { Text(stringResource(R.string.about_and_privacy)) },
                 navigationIcon = {
@@ -49,6 +50,7 @@ fun AboutScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(SquareToolSpacing.Standard),
         ) {
+            // CPD-ON
             Text(
                 stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,

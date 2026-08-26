@@ -10,10 +10,10 @@
     "deepsec": "deepsec",
     "deepsec:scan": "deepsec scan --project-id squaretool",
     "deepsec:process": "deepsec process --project-id squaretool --agent codex --model gpt-5.6-luna --thinking-level xhigh",
-    "deepsec:revalidate": "deepsec revalidate --project-id squaretool --agent codex --model gpt-5.6-luna --thinking-level xhigh --min-severity HIGH",
+    "deepsec:revalidate": "deepsec revalidate --project-id squaretool --agent codex --model gpt-5.6-luna --thinking-level xhigh",
     "deepsec:export": "deepsec export --project-id squaretool --format md-dir --out ./findings",
     "deepsec:report": "pnpm run deepsec:scan && pnpm run deepsec:process && pnpm run deepsec:export",
-    "deepsec:report:custom": "pnpm run deepsec:report"
+    "deepsec:report:custom": "pnpm run deepsec:scan && pnpm run deepsec:revalidate && pnpm run deepsec:process && pnpm run deepsec:export"
   },
   "dependencies": {
     "deepsec": "2.2.9"

@@ -18,4 +18,13 @@
         <packageUrl>pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.4.10</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
+    <suppress until="2027-08-12Z">
+        <notes><![CDATA[
+        Compose Stability Analyzer Runtime is an Android Compose library, not
+        GitHub Enterprise Server. Dependency-Check mistakes its
+        com.github.skydoves Maven group for the unrelated GitHub product CPE.
+        ]]></notes>
+        <packageUrl>pkg:maven/com.github.skydoves/compose-stability-runtime-android@0.13.0</packageUrl>
+        <cpe>cpe:/a:github:github</cpe>
+    </suppress>
 </suppressions>

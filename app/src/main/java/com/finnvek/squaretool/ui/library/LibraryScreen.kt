@@ -29,7 +29,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
@@ -42,7 +41,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -66,6 +64,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,45 +86,51 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.finnvek.squaretool.R
 import com.finnvek.squaretool.data.local.ColorEntity
 import com.finnvek.squaretool.data.repository.SquareToolRepository
+import com.finnvek.squaretool.ui.SquareToolEditorActions
+import com.finnvek.squaretool.ui.SquareToolLoadingIndicator
+import com.finnvek.squaretool.ui.SquareToolMenuItem
+import com.finnvek.squaretool.ui.SquareToolSearchClearButton
 import com.finnvek.squaretool.ui.squares.ColorSwatch
 import com.finnvek.squaretool.ui.theme.SquareToolSpacing
 
+@Suppress("kotlin:S107") // Route callbacks keep editor and library destinations independently typed.
 @Composable
 fun LibraryRoute(
     repository: SquareToolRepository,
     modifier: Modifier = Modifier,
+    libraryViewModel: LibraryViewModel = viewModel(factory = LibraryViewModel.factory(repository)),
     projectId: String? = null,
     onCreateColor: () -> Unit = {},
     onEditColor: (id: String, duplicate: Boolean) -> Unit = { _, _ -> },
     onCreatePalette: () -> Unit = {},
     onEditPalette: (id: String, duplicate: Boolean) -> Unit = { _, _ -> },
 ) {
-    val viewModel: LibraryViewModel = viewModel(factory = LibraryViewModel.factory(repository))
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by libraryViewModel.uiState.collectAsStateWithLifecycle()
     LibraryScreen(
         state = state,
         projectId = projectId,
-        onTabSelected = viewModel::onTabSelected,
-        onQueryChange = viewModel::onQueryChange,
+        onSelectTab = libraryViewModel::onTabSelected,
+        onQueryChange = libraryViewModel::onQueryChange,
         onCreateColor = onCreateColor,
         onEditColor = onEditColor,
-        onDeleteColor = viewModel::deleteColor,
+        onDeleteColor = libraryViewModel::deleteColor,
         onCreatePalette = onCreatePalette,
         onEditPalette = onEditPalette,
-        onDeletePalette = viewModel::deletePalette,
-        onApplyPalette = viewModel::applyPalette,
-        onSaveProjectPalette = viewModel::saveProjectPalette,
-        onNoticeShown = viewModel::clearNotice,
+        onDeletePalette = libraryViewModel::deletePalette,
+        onApplyPalette = libraryViewModel::applyPalette,
+        onSaveProjectPalette = libraryViewModel::saveProjectPalette,
+        onShowNotice = libraryViewModel::clearNotice,
         modifier = modifier,
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Declarative library branches mirror tabs, selection, and dialogs.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
     state: LibraryUiState,
     projectId: String?,
-    onTabSelected: (LibraryTab) -> Unit,
+    onSelectTab: (LibraryTab) -> Unit,
     onQueryChange: (String) -> Unit,
     onCreateColor: () -> Unit,
     onEditColor: (String, Boolean) -> Unit,
@@ -135,12 +140,13 @@ fun LibraryScreen(
     onDeletePalette: (String) -> Unit,
     onApplyPalette: (String, String) -> Unit,
     onSaveProjectPalette: (String, String) -> Unit,
-    onNoticeShown: () -> Unit,
+    onShowNotice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showSaveProjectPalette by remember { mutableStateOf(false) }
     var projectPaletteName by remember { mutableStateOf("") }
     val snackbarHost = remember { SnackbarHostState() }
+    val currentOnShowNotice by rememberUpdatedState(onShowNotice)
     val noticeText =
         state.notice?.let { notice ->
             when (notice) {
@@ -173,7 +179,7 @@ fun LibraryScreen(
     LaunchedEffect(noticeText) {
         if (noticeText != null) {
             snackbarHost.showSnackbar(noticeText)
-            onNoticeShown()
+            currentOnShowNotice()
         }
     }
 
@@ -226,9 +232,7 @@ fun LibraryScreen(
                     trailingIcon =
                         if (state.query.isNotEmpty()) {
                             {
-                                IconButton(onClick = { onQueryChange("") }) {
-                                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.library_clear_search))
-                                }
+                                SquareToolSearchClearButton(R.string.library_clear_search, onClick = { onQueryChange("") })
                             }
                         } else {
                             null
@@ -240,7 +244,7 @@ fun LibraryScreen(
                 LibraryTab.entries.forEach { tab ->
                     Tab(
                         selected = state.selectedTab == tab,
-                        onClick = { onTabSelected(tab) },
+                        onClick = { onSelectTab(tab) },
                         text = {
                             Text(
                                 stringResource(
@@ -437,22 +441,7 @@ private fun ColorLibraryCard(
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.library_more_actions, color.name))
                 }
                 DropdownMenu(expanded, { expanded = false }) {
-                    if (!color.builtIn) {
-                        LibraryMenuItem(R.string.library_edit, Icons.Default.Edit) {
-                            expanded = false
-                            onEdit()
-                        }
-                    }
-                    LibraryMenuItem(R.string.library_duplicate, Icons.Default.SwapHoriz) {
-                        expanded = false
-                        onDuplicate()
-                    }
-                    if (!color.builtIn) {
-                        LibraryMenuItem(R.string.library_delete, Icons.Default.Delete) {
-                            expanded = false
-                            onDelete()
-                        }
-                    }
+                    LibraryItemMenuActions(color.builtIn, { expanded = false }, onEdit, onDuplicate, onDelete)
                 }
             }
         }
@@ -485,22 +474,7 @@ private fun PaletteLibraryCard(
                         Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.library_more_actions, item.palette.name))
                     }
                     DropdownMenu(expanded, { expanded = false }) {
-                        if (!item.palette.builtIn) {
-                            LibraryMenuItem(R.string.library_edit, Icons.Default.Edit) {
-                                expanded = false
-                                onEdit()
-                            }
-                        }
-                        LibraryMenuItem(R.string.library_duplicate, Icons.Default.SwapHoriz) {
-                            expanded = false
-                            onDuplicate()
-                        }
-                        if (!item.palette.builtIn) {
-                            LibraryMenuItem(R.string.library_delete, Icons.Default.Delete) {
-                                expanded = false
-                                onDelete()
-                            }
-                        }
+                        LibraryItemMenuActions(item.palette.builtIn, { expanded = false }, onEdit, onDuplicate, onDelete)
                     }
                 }
             }
@@ -517,16 +491,29 @@ private fun PaletteLibraryCard(
 }
 
 @Composable
-private fun LibraryMenuItem(
-    label: Int,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit,
+private fun LibraryItemMenuActions(
+    builtIn: Boolean,
+    closeMenu: () -> Unit,
+    onEdit: () -> Unit,
+    onDuplicate: () -> Unit,
+    onDelete: () -> Unit,
 ) {
-    DropdownMenuItem(
-        text = { Text(stringResource(label)) },
-        onClick = onClick,
-        leadingIcon = { Icon(icon, contentDescription = null) },
-    )
+    if (!builtIn) {
+        SquareToolMenuItem(R.string.library_edit, Icons.Default.Edit, onClick = {
+            closeMenu()
+            onEdit()
+        })
+    }
+    SquareToolMenuItem(R.string.library_duplicate, Icons.Default.SwapHoriz, onClick = {
+        closeMenu()
+        onDuplicate()
+    })
+    if (!builtIn) {
+        SquareToolMenuItem(R.string.library_delete, Icons.Default.Delete, onClick = {
+            closeMenu()
+            onDelete()
+        })
+    }
 }
 
 @Composable
@@ -535,28 +522,29 @@ fun ColorEditorRoute(
     modifier: Modifier = Modifier,
     colorId: String? = null,
     duplicate: Boolean = false,
-    onClose: () -> Unit = {},
-) {
-    val viewModel: ColorEditorViewModel =
+    colorEditorViewModel: ColorEditorViewModel =
         viewModel(
             key = "color-editor-$colorId-$duplicate",
             factory = ColorEditorViewModel.factory(repository, colorId, duplicate),
-        )
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+        ),
+    onClose: () -> Unit = {},
+) {
+    val state by colorEditorViewModel.uiState.collectAsStateWithLifecycle()
     ColorEditorScreen(
         state = state,
         isNew = colorId == null,
         isDuplicate = duplicate,
-        onDraftChange = viewModel::updateDraft,
-        onHueChange = { viewModel.updateHsl(hue = it) },
-        onSaturationChange = { viewModel.updateHsl(saturation = it) },
-        onLightnessChange = { viewModel.updateHsl(lightness = it) },
-        onSave = { viewModel.save(onClose) },
+        onDraftChange = colorEditorViewModel::updateDraft,
+        onHueChange = { colorEditorViewModel.updateHsl(hue = it) },
+        onSaturationChange = { colorEditorViewModel.updateHsl(saturation = it) },
+        onLightnessChange = { colorEditorViewModel.updateHsl(lightness = it) },
+        onSave = { colorEditorViewModel.save(onClose) },
         onCancel = onClose,
         modifier = modifier,
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Explicit draft actions keep color editing type-safe and locally visible.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColorEditorScreen(
@@ -593,7 +581,7 @@ fun ColorEditorScreen(
         },
     ) { padding ->
         if (state.isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+            SquareToolLoadingIndicator(Modifier.padding(padding))
         } else {
             Column(
                 Modifier
@@ -652,9 +640,9 @@ fun ColorEditorScreen(
                     ColorSurfacePreview(parsedColor, true, Modifier.weight(1f))
                     ColorSurfacePreview(parsedColor, false, Modifier.weight(1f))
                 }
-                ColorSlider(R.string.color_editor_hue, hsl.hue, 0f..360f, onHueChange)
-                ColorSlider(R.string.color_editor_saturation, hsl.saturation, 0f..1f, onSaturationChange)
-                ColorSlider(R.string.color_editor_lightness, hsl.lightness, 0f..1f, onLightnessChange)
+                ColorSlider(R.string.color_editor_hue, hsl.hue, 360f, onHueChange)
+                ColorSlider(R.string.color_editor_saturation, hsl.saturation, 1f, onSaturationChange)
+                ColorSlider(R.string.color_editor_lightness, hsl.lightness, 1f, onLightnessChange)
                 HorizontalDivider()
                 Text(
                     stringResource(
@@ -700,14 +688,13 @@ fun ColorEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
                 )
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(SquareToolSpacing.Medium)) {
-                    OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f).heightIn(min = 56.dp)) {
-                        Text(stringResource(R.string.color_editor_cancel))
-                    }
-                    Button(onClick = onSave, modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("save_color")) {
-                        Text(stringResource(R.string.color_editor_save))
-                    }
-                }
+                SquareToolEditorActions(
+                    cancelLabel = R.string.color_editor_cancel,
+                    saveLabel = R.string.color_editor_save,
+                    saveTestTag = "save_color",
+                    onCancel = onCancel,
+                    onSave = onSave,
+                )
                 Spacer(Modifier.height(SquareToolSpacing.Section))
             }
         }
@@ -718,7 +705,7 @@ fun ColorEditorScreen(
 private fun ColorSurfacePreview(
     argb: Long?,
     light: Boolean,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val surface = if (light) Color(0xFFFFFDF7) else Color(0xFF292A1C)
     val swatch = argb?.let { Color(it.toInt()) } ?: MaterialTheme.colorScheme.surfaceVariant
@@ -752,10 +739,11 @@ private fun ColorSurfacePreview(
 private fun ColorSlider(
     labelRes: Int,
     value: Float,
-    range: ClosedFloatingPointRange<Float>,
+    maxValue: Float,
     onChange: (Float) -> Unit,
 ) {
     val label = stringResource(labelRes)
+    val range = 0f..maxValue
     Column {
         Row(Modifier.fillMaxWidth()) {
             Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
@@ -782,30 +770,31 @@ fun PaletteEditorRoute(
     paletteId: String? = null,
     duplicate: Boolean = false,
     projectId: String? = null,
-    onClose: () -> Unit = {},
-) {
-    val viewModel: PaletteEditorViewModel =
+    paletteEditorViewModel: PaletteEditorViewModel =
         viewModel(
             key = "palette-editor-$paletteId-$duplicate",
             factory = PaletteEditorViewModel.factory(repository, paletteId, duplicate),
-        )
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+        ),
+    onClose: () -> Unit = {},
+) {
+    val state by paletteEditorViewModel.uiState.collectAsStateWithLifecycle()
     PaletteEditorScreen(
         state = state,
         isNew = paletteId == null,
         isDuplicate = duplicate,
         projectId = projectId,
-        onNameChange = viewModel::updateName,
-        onToggleColor = viewModel::toggleColor,
-        onRemoveColor = viewModel::removeColor,
-        onMoveColor = viewModel::moveColor,
-        onSave = { viewModel.save(onClose) },
-        onApply = { projectId?.let(viewModel::applyToProject) },
+        onNameChange = paletteEditorViewModel::updateName,
+        onToggleColor = paletteEditorViewModel::toggleColor,
+        onRemoveColor = paletteEditorViewModel::removeColor,
+        onMoveColor = paletteEditorViewModel::moveColor,
+        onSave = { paletteEditorViewModel.save(onClose) },
+        onApply = { projectId?.let(paletteEditorViewModel::applyToProject) },
         onCancel = onClose,
         modifier = modifier,
     )
 }
 
+@Suppress("kotlin:S107", "kotlin:S3776") // Explicit draft actions keep palette editing type-safe and locally visible.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaletteEditorScreen(
@@ -930,14 +919,13 @@ fun PaletteEditorScreen(
                     item { Text(stringResource(R.string.library_palette_applied), color = MaterialTheme.colorScheme.primary) }
                 }
                 item {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(SquareToolSpacing.Medium)) {
-                        OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f).heightIn(min = 56.dp)) {
-                            Text(stringResource(R.string.palette_editor_cancel))
-                        }
-                        Button(onClick = onSave, modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("save_palette")) {
-                            Text(stringResource(R.string.palette_editor_save))
-                        }
-                    }
+                    SquareToolEditorActions(
+                        cancelLabel = R.string.palette_editor_cancel,
+                        saveLabel = R.string.palette_editor_save,
+                        saveTestTag = "save_palette",
+                        onCancel = onCancel,
+                        onSave = onSave,
+                    )
                 }
                 if (projectId != null) {
                     item {
