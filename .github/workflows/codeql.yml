@@ -29,7 +29,7 @@ jobs:
           java-version: "17"
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@9e3211c9a3b9311dfe05da2ed48eea3386f042dd # v4.37.6
+        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         with:
           languages: java-kotlin
           build-mode: manual
@@ -38,4 +38,4 @@ jobs:
         run: ./gradlew :app:assembleDebug -Pkotlin.compiler.execution.strategy=in-process --no-daemon --console=plain --no-build-cache
 
       - name: Analyze
-        uses: github/codeql-action/analyze@9e3211c9a3b9311dfe05da2ed48eea3386f042dd # v4.37.6
+        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
