@@ -68,6 +68,10 @@ android {
         animationsDisabled = true
         unitTests.isIncludeAndroidResources = true
     }
+
+    testCoverage {
+        jacocoVersion = "0.8.15"
+    }
 }
 
 kotlin {
