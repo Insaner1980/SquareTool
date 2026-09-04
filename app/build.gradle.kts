@@ -68,6 +68,10 @@ android {
         animationsDisabled = true
         unitTests.isIncludeAndroidResources = true
     }
+
+    testCoverage {
+        jacocoVersion = "0.8.15"
+    }
 }
 
 kotlin {
@@ -81,7 +85,7 @@ room {
 }
 
 val jacocoAnt = configurations.create("jacocoOfflineAnt")
-dependencies.add(jacocoAnt.name, "org.jacoco:org.jacoco.ant:0.8.14")
+dependencies.add(jacocoAnt.name, "org.jacoco:org.jacoco.ant:0.8.15")
 val repositoryCoverageClasses = layout.buildDirectory.dir("jacoco/repository-classes")
 val instrumentRepositoryForCoverage =
     tasks.register("instrumentRepositoryForCoverage") {
