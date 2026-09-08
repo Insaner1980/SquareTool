@@ -24,7 +24,7 @@ compose-rules = "0.6.4"
 compose-stability-analyzer = "0.13.0"
 android-security-lints = "1.0.4"
 owasp-dependency-check = "13.0.0"
-sonarqube = "7.4.0.8496"
+sonarqube = "7.5.0.8588"
 
 [libraries]
 androidx-core = { module = "androidx.core:core", version.ref = "core" }
