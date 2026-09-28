@@ -118,6 +118,8 @@ val instrumentRepositoryForCoverage =
     }
 
 tasks.withType<Test>().configureEach {
+    // Robolectric needs SharedSecrets access when creating Android shared memory.
+    jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
     if (name == "testDebugUnitTest") {
         notCompatibleWithConfigurationCache("Prepends offline-instrumented repository classes at execution time")
         dependsOn(instrumentRepositoryForCoverage)

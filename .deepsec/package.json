@@ -16,13 +16,11 @@
     "deepsec:report:custom": "pnpm run deepsec:scan && pnpm run deepsec:revalidate && pnpm run deepsec:process && pnpm run deepsec:export"
   },
   "dependencies": {
-    "deepsec": "2.2.9"
+    "deepsec": "2.3.10"
   },
   "pnpm": {
     "overrides": {
-      "fast-uri": "3.1.7",
-      "qs": "6.16.0",
-      "undici@8.5.0": "8.10.0"
+      "undici@8.5.0": "8.11.2"
     }
   }
 }
